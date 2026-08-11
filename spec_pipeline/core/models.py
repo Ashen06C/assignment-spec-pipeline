@@ -269,6 +269,9 @@ class ApprovalDecision(BaseModel):
     status: ApprovalStatus = ApprovalStatus.PENDING
     reviewer: str = ""
     comments: str = ""
+    signature: str = Field(
+        default="", description="HMAC-SHA256 cryptographic signature token"
+    )
     decided_at: datetime | None = None
 
 
