@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spec-pipeline"
+version = "0.1.0"
+description = "AI-native, spec-driven development pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Developer"},
+]
+
+dependencies = [
+    "pydantic>=2.5.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.7.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.8",
+    "mypy>=1.7.0",
+]
+
+[project.scripts]
+spec-pipeline = "spec_pipeline.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["spec_pipeline*"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=spec_pipeline --cov-report=term-missing -v"
