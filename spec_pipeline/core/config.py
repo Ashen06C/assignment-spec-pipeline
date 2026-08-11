@@ -25,7 +25,7 @@ class PipelineSettings:
 
     gemini_api_key: str
     openai_api_key: str
-    llm_provider: str   # "gemini" | "openai"
+    llm_provider: str   # "gemini" | "openai" | "mock"
     llm_model: str
 
     # ---- derived helpers -------------------------------------------------- #
@@ -37,6 +37,8 @@ class PipelineSettings:
             return self.gemini_api_key
         if self.llm_provider == "openai":
             return self.openai_api_key
+        if self.llm_provider == "mock":
+            return "mock-key"
         raise ValueError(f"Unsupported LLM provider: {self.llm_provider!r}")
 
 
