@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  spec-pipeline-studio:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: spec-pipeline-studio
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_PROVIDER=mock
+      - GOVERNANCE_SIGNING_SECRET=governance-hmac-key
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - ../artifacts:/app/artifacts
+      - ../examples:/app/examples
+    restart: unless-stopped

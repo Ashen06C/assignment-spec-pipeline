@@ -2,11 +2,12 @@
 > *Autonomous software lifecycle powered by formal specifications, AI synthesis, deterministic quality gates, and cryptographic governance.*
 
 [![CI Status](https://img.shields.io/badge/CI-Passing-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/Tests-96%20Passing-success.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-107%20Passing-success.svg)]()
 [![Coverage](https://img.shields.io/badge/Coverage-87%25-brightgreen.svg)]()
 [![SLSA](https://img.shields.io/badge/Provenance-SLSA%20v0.2%20Attested-blue.svg)]()
 [![Type Checked](https://img.shields.io/badge/Mypy-Strict-blue.svg)]()
 [![Lint Checked](https://img.shields.io/badge/Ruff-Compliant-orange.svg)]()
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)]()
 
 ---
 
@@ -16,12 +17,14 @@
 2. [End-to-End Architecture](#-end-to-end-architecture)
 3. [The 7 Lifecycle Stages](#-the-7-lifecycle-stages)
 4. [Quickstart & Demo](#-quickstart--demo)
-5. [CLI Reference](#-cli-reference)
-6. [Governance, Signatures & SLSA v0.2 Provenance](#-governance-signatures--slsa-v02-provenance)
-7. [Deterministic Quality Gates](#-deterministic-quality-gates)
-8. [Testing & Quality Verification](#-testing--quality-verification)
-9. [Architectural Decisions & Trade-offs](#-architectural-decisions--trade-offs)
-10. [Limitations & Future Roadmap](#-limitations--future-roadmap)
+5. [Docker Setup](#-docker-setup)
+6. [CLI & Web Studio Reference](#-cli--web-studio-reference)
+7. [Governance, Signatures & SLSA v0.2 Provenance](#-governance-signatures--slsa-v02-provenance)
+8. [Deterministic Quality Gates](#-deterministic-quality-gates)
+9. [Testing & Quality Verification](#-testing--quality-verification)
+10. [Architectural Decisions & Trade-offs](#-architectural-decisions--trade-offs)
+11. [Detailed Documentation Guides](#-detailed-documentation-guides)
+12. [Limitations & Future Roadmap](#-limitations--future-roadmap)
 
 ---
 
@@ -141,6 +144,22 @@ python run_ui.py
 
 ---
 
+## 🐳 Docker Setup
+
+Run the entire pipeline and Web Studio in a containerized environment with zero local setup:
+
+```bash
+# Build and start via Docker Compose
+docker compose -f docker/docker-compose.yml up --build
+
+# Or build standalone Docker image
+docker build -t spec-pipeline -f docker/Dockerfile .
+docker run -p 8000:8000 -v $(pwd)/artifacts:/app/artifacts spec-pipeline
+```
+> Access the Web Studio in your browser at `http://localhost:8000/`.
+
+---
+
 ## 💻 CLI & Web Studio Reference
 
 The pipeline includes a rich Typer CLI interface:
@@ -229,24 +248,24 @@ The pipeline enforces 6 strict quality gates before any code can proceed to depl
 
 ## 📊 Testing & Quality Verification
 
-### Comprehensive Test Suite (96 Passing Tests)
+### Comprehensive Test Suite (107 Passing Tests)
 ```bash
 # Run full test suite with coverage report
 pytest -v --cov=spec_pipeline --cov-report=term-missing
 ```
 
 ```
-============================= 96 passed in 11.19s =============================
+============================ 107 passed in 14.69s =============================
 Coverage: 87% across all core domain modules.
 ```
 
 ### Static Analysis & Linter Verification
 ```bash
 # Ruff Lint Check (0 errors, 0 warnings)
-ruff check spec_pipeline/ tests/ demo.py
+ruff check spec_pipeline/ tests/ demo.py run_ui.py
 
-# Mypy Static Type Checking (Strict compliance across 55 source files)
-mypy spec_pipeline/ tests/ demo.py --ignore-missing-imports
+# Mypy Static Type Checking (Strict compliance across all source files)
+mypy spec_pipeline/ tests/ demo.py run_ui.py --ignore-missing-imports
 ```
 
 ---

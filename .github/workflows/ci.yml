@@ -22,23 +22,23 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
+    - name: Install package and dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
 
     - name: Lint check with Ruff
       run: |
-        ruff check spec_pipeline/ tests/ demo.py
+        ruff check spec_pipeline/ tests/ demo.py run_ui.py
 
     - name: Static Type Check with Mypy
       run: |
-        mypy spec_pipeline/ tests/ demo.py --ignore-missing-imports
+        mypy spec_pipeline/ tests/ demo.py run_ui.py --ignore-missing-imports
 
     - name: Run Test Suite & Coverage
       run: |
         pytest -v --cov=spec_pipeline --cov-report=term-missing
 
-    - name: Run End-to-End Demo Script
+    - name: Run End-to-End CLI Demonstration
       run: |
         python demo.py
