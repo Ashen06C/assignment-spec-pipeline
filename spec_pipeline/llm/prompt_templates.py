@@ -148,13 +148,20 @@ TEST_GENERATION_JSON_SCHEMA = """\
 def build_test_generation_prompt(
     spec_dict: dict[str, Any],
     changes: list[dict[str, Any]],
+    plan_dict: dict[str, Any] | None = None,
 ) -> str:
     """Build the user prompt for the test generation stage."""
+    plan_section = (
+        f"\n\n## Implementation Plan\n```json\n{json.dumps(plan_dict, indent=2)}\n```"
+        if plan_dict
+        else ""
+    )
     return (
-        "Using the feature specification and code changes below, "
+        "Using the feature specification, implementation plan, and code changes below, "
         "generate comprehensive test cases.\n\n"
         "## Feature Specification\n"
-        f"```json\n{json.dumps(spec_dict, indent=2)}\n```\n\n"
+        f"```json\n{json.dumps(spec_dict, indent=2)}\n```"
+        f"{plan_section}\n\n"
         "## Code Changes\n"
         f"```json\n{json.dumps(changes, indent=2)}\n```\n\n"
         "## Required JSON Schema\n"
