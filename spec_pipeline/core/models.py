@@ -144,6 +144,8 @@ class EvaluatedRisk(BaseModel):
 class TestStrategy(BaseModel):
     """High-level testing strategy produced by the planning layer."""
 
+    __test__ = False
+
     unit_test_focus: list[str] = Field(default_factory=list)
     integration_test_focus: list[str] = Field(default_factory=list)
     acceptance_test_mapping: dict[str, str] = Field(
@@ -217,6 +219,8 @@ class SynthesizedTest(BaseModel):
 
 class TestGenerationOutput(BaseModel):
     """Aggregate output of the test-generation stage."""
+
+    __test__ = False
 
     plan_id: UUID
     tests: list[SynthesizedTest] = Field(default_factory=list)
