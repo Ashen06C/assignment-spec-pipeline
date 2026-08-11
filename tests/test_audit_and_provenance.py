@@ -238,7 +238,7 @@ class TestSLSAProvenance:
 
         # Predicate metadata
         predicate = statement["predicate"]
-        assert "newtonrussell.ai" in predicate["builder"]["id"]
+        assert "spec-pipeline.ai" in predicate["builder"]["id"]
         assert len(predicate["materials"]) >= 1
         assert len(predicate["approvals"]) == 1
         assert predicate["qualityVerification"]["all_passed"] is True

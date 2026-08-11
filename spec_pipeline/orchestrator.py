@@ -96,24 +96,39 @@ class PipelineOrchestrator:
 
     # ── Stage-by-Stage Granular Methods ───────────────────────────────────── #
 
-    def stage_intake(self, spec_path_or_content: str | Path) -> FeatureSpec:
+    def stage_intake(
+        self, spec_path_or_content: str | Path, fmt: str | None = None
+    ) -> FeatureSpec:
         """Stage 1: Ingest, compute fingerprint, and validate 6-section schema."""
         if isinstance(spec_path_or_content, Path) or (
             isinstance(spec_path_or_content, str) and Path(spec_path_or_content).is_file()
         ):
             spec = self.parser.parse_file(Path(spec_path_or_content))
         else:
-            # Assume raw markdown string
-            spec = self.parser.parse_markdown(str(spec_path_or_content))
+            raw_text = str(spec_path_or_content).strip()
+            fmt_lower = (fmt or "").lower()
+            if fmt_lower == "json" or (not fmt and raw_text.startswith("{")):
+                spec = self.parser.parse_json(raw_text)
+            elif (
+                fmt_lower in {"yaml", "yml"}
+                or (
+                    not fmt
+                    and ("objective:" in raw_text or "title:" in raw_text)
+                    and not raw_text.startswith("#")
+                )
+            ):
+                spec = self.parser.parse_yaml(raw_text)
+            else:
+                spec = self.parser.parse_markdown(raw_text)
 
         self.validator.validate_or_raise(spec)
         return spec
 
     def stage_plan(
-        self, spec_path_or_content: str | Path
+        self, spec_path_or_content: str | Path, fmt: str | None = None
     ) -> tuple[FeatureSpec, ImplementationPlan, AuditRecord]:
         """Stage 1 + Stage 2: Ingest spec and generate technical implementation plan."""
-        spec = self.stage_intake(spec_path_or_content)
+        spec = self.stage_intake(spec_path_or_content, fmt=fmt)
         record = self.audit_logger.create_record(spec)
 
         plan = self.planner.plan(spec)
@@ -169,6 +184,7 @@ class PipelineOrchestrator:
         artifacts_dir: Path | None = None,
         auto_approve: bool = True,
         reviewer: str = "Release Lead",
+        comments: str = "",
     ) -> tuple[ApprovalDecision, dict[str, Any], str, str]:
         """Stage 7: Pre-merge governance, audit sealing, SLSA provenance, and dashboards."""
         decision_2 = self.human_gate.request_pre_merge_approval(
@@ -178,6 +194,7 @@ class PipelineOrchestrator:
             quality_suite=quality_suite,
             auto_approve=auto_approve,
             reviewer=reviewer,
+            comments=comments,
         )
         self.audit_logger.log_approval(record, decision_2)
 
@@ -214,10 +231,11 @@ class PipelineOrchestrator:
         artifacts_dir: str | Path | None = None,
         auto_approve: bool = False,
         reviewer: str = "Lead Engineer",
+        spec_format: str | None = None,
     ) -> PipelineOrchestratorResult:
         """Run all 7 lifecycle stages deterministically from end-to-end."""
         # 1. Spec Intake & Validation
-        spec, plan, record = self.stage_plan(spec_path_or_content)
+        spec, plan, record = self.stage_plan(spec_path_or_content, fmt=spec_format)
 
         # 2. Checkpoint #1: Pre-Implementation Approval
         decision_1 = self.human_gate.request_pre_implementation_approval(

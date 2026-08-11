@@ -1,4 +1,4 @@
-"""Specification validator enforcing the 6-section Newton Russell standard.
+"""Specification validator enforcing the 6-section standard.
 
 Mandatory sections
 ------------------
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class SpecValidator:
-    """Validates a ``FeatureSpec`` against the Newton Russell specification standard."""
+    """Validates a ``FeatureSpec`` against the specification standard."""
 
     # Sub-model required fields — used for structural checks.
     _USER_STORY_FIELDS = {"as_a", "i_want", "so_that"}

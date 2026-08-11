@@ -24,7 +24,7 @@ if TYPE_CHECKING:
         QualityGateSuiteResult,
     )
 
-DEFAULT_SIGNING_SECRET = "newton-russell-governance-hmac-key"
+DEFAULT_SIGNING_SECRET = "governance-hmac-key"
 
 
 class HumanApprovalGate:

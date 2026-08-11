@@ -17,7 +17,7 @@ from spec_pipeline.spec_intake.validator import SpecValidator
 
 app = typer.Typer(
     name="spec-pipeline",
-    help="Newton Russell — AI-Native Spec-Driven Development Pipeline CLI.",
+    help="AI-Native Spec-Driven Development Pipeline CLI.",
     no_args_is_help=True,
 )
 console = Console()
@@ -211,7 +211,7 @@ def run(
 
     console.print(
         Panel.fit(
-            f"[bold blue]Newton Russell — Spec-Driven Pipeline Execution[/]\n"
+            f"[bold blue]Spec-Driven Pipeline Execution[/]\n"
             f"Spec: [white]{spec_path}[/]\n"
             f"Provider: [yellow]{provider}[/]"
             + (f" ({model})" if model else "")

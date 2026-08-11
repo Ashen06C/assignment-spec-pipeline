@@ -1,9 +1,9 @@
 {
-  "run_id": "427c7581-f332-4b5b-9c88-d747a599b158",
-  "spec_id": "6266fd35-0d57-4ce0-b8b3-93e268e1b007",
+  "run_id": "a19ad83a-3735-4c2e-9d96-35451dc9612c",
+  "spec_id": "e559ebcc-35f8-4433-b3cf-245da5928300",
   "spec_version": 1,
   "spec_snapshot": {
-    "spec_id": "6266fd35-0d57-4ce0-b8b3-93e268e1b007",
+    "spec_id": "e559ebcc-35f8-4433-b3cf-245da5928300",
     "version": 1,
     "title": "Token Bucket Rate Limiter",
     "objective": "Implement a token-bucket algorithm as the core rate-limiting strategy, supporting configurable burst capacity and steady-state refill rates for fine-grained traffic shaping.\n",
@@ -78,20 +78,20 @@
       "Dynamic reconfiguration without restart",
       "Cost-based token weighting per endpoint"
     ],
-    "created_at": "2026-08-11T19:52:24.366421Z",
+    "created_at": "2026-08-11T20:18:10.946441Z",
     "spec_hash": "dce911408b6b924c0aa93d572e839d4099914820b34b8519ef682e53d96abea6",
     "REQUIRED_SECTIONS": [
-      "out_of_scope",
+      "non_functional_requirements",
+      "objective",
       "business_rules",
       "user_stories",
-      "objective",
-      "acceptance_criteria",
-      "non_functional_requirements"
+      "out_of_scope",
+      "acceptance_criteria"
     ]
   },
   "plan_snapshot": {
-    "plan_id": "7524572d-1012-460e-b86e-d668ecb99ff0",
-    "spec_id": "6266fd35-0d57-4ce0-b8b3-93e268e1b007",
+    "plan_id": "924c06f9-409c-4a80-a339-5cb1f66377b3",
+    "spec_id": "e559ebcc-35f8-4433-b3cf-245da5928300",
     "tasks": [
       {
         "task_id": "TASK-001",
@@ -197,36 +197,36 @@
         "AC-003": "Verify performance under expected load"
       }
     },
-    "created_at": "2026-08-11T19:52:24.367520Z"
+    "created_at": "2026-08-11T20:18:10.947555Z"
   },
   "llm_interactions": [],
   "generated_outputs": [
     {
       "type": "code_synthesis",
       "data": {
-        "plan_id": "7524572d-1012-460e-b86e-d668ecb99ff0",
+        "plan_id": "924c06f9-409c-4a80-a339-5cb1f66377b3",
         "changes": [
           {
             "path": "src/models/feature.py",
             "action": "create",
             "content": "\"\"\"Data models for the feature.\"\"\"\n\nfrom pydantic import BaseModel, Field\n\n\nclass FeatureRequest(BaseModel):\n    \"\"\"Request model for Token Bucket Rate Limiter.\"\"\"\n\n    name: str = Field(..., description=\"Feature name\")\n    enabled: bool = Field(default=True, description=\"Whether the feature is active\")\n",
-            "diff_summary": "Created data models for Token Bucket Rate Limiter\n--- a/src/models/feature.py\n+++ b/src/models/feature.py\n@@ -0,0 +1,10 @@\n+\"\"\"Data models for the feature.\"\"\"\n+\n+from pydantic import BaseModel, Field\n+\n+\n+class FeatureRequest(BaseModel):\n+    \"\"\"Request model for Token Bucket Rate Limiter.\"\"\"\n+\n+    name: str = Field(..., description=\"Feature name\")\n+    enabled: bool = Field(default=True, description=\"Whether the feature is active\")"
+            "diff_summary": "Created data models for Token Bucket Rate Limiter"
           },
           {
             "path": "src/services/feature_service.py",
             "action": "create",
             "content": "\"\"\"Service layer for the feature.\"\"\"\n\nfrom src.models.feature import FeatureRequest\n\n\nclass FeatureService:\n    \"\"\"Business logic for Token Bucket Rate Limiter.\"\"\"\n\n    def process(self, request: FeatureRequest) -> dict[str, str]:\n        \"\"\"Process a feature request.\"\"\"\n        if not request.name:\n            raise ValueError(\"Name is required\")\n        return {\"status\": \"processed\", \"name\": request.name}\n",
-            "diff_summary": "Created service logic for Token Bucket Rate Limiter\n--- a/src/services/feature_service.py\n+++ b/src/services/feature_service.py\n@@ -0,0 +1,13 @@\n+\"\"\"Service layer for the feature.\"\"\"\n+\n+from src.models.feature import FeatureRequest\n+\n+\n+class FeatureService:\n+    \"\"\"Business logic for Token Bucket Rate Limiter.\"\"\"\n+\n+    def process(self, request: FeatureRequest) -> dict[str, str]:\n+        \"\"\"Process a feature request.\"\"\"\n+        if not request.name:\n+            raise ValueError(\"Name is required\")\n+        return {\"status\": \"processed\", \"name\": request.name}"
+            "diff_summary": "Created service logic for Token Bucket Rate Limiter"
           }
         ],
         "change_summary": "Generated 2 files for Token Bucket Rate Limiter: data models and service layer.",
-        "created_at": "2026-08-11T19:52:24.370346Z"
+        "created_at": "2026-08-11T20:18:10.949697Z"
       }
     },
     {
       "type": "test_generation",
       "data": {
-        "plan_id": "7524572d-1012-460e-b86e-d668ecb99ff0",
+        "plan_id": "924c06f9-409c-4a80-a339-5cb1f66377b3",
         "tests": [
           {
             "test_id": "TEST-001",
@@ -254,7 +254,7 @@
           }
         ],
         "coverage_notes": "### Acceptance Criteria Traceability Matrix\n**Total Coverage**: 100% (3/3 criteria covered)\n\n| Criterion ID | Title | Test Type(s) | Test Function(s) | Status |\n| :--- | :--- | :--- | :--- | :--- |\n| `AC-001` | Token consumption | acceptance | `test_acceptance_ac_001_token_consumption` | \u2705 Covered |\n| `AC-002` | Burst exhaustion | acceptance | `test_acceptance_ac_002_burst_exhaustion` | \u2705 Covered |\n| `AC-003` | Token refill | acceptance | `test_acceptance_ac_003_token_refill` | \u2705 Covered |",
-        "created_at": "2026-08-11T19:52:24.371728Z"
+        "created_at": "2026-08-11T20:18:10.950778Z"
       }
     }
   ],
@@ -262,22 +262,22 @@
     {
       "checkpoint": "pre-implementation",
       "status": "approved",
-      "reviewer": "Newton Russell Demo Lead",
+      "reviewer": "Architect",
       "comments": "Pre-implementation design and blast radius approved.",
-      "signature": "db38e82bb6c12176cc5c98995a398266d1871fbe85c810028ac77016e5572dde",
-      "decided_at": "2026-08-11T19:52:24.367568Z"
+      "signature": "3360742ddb0f0845c3ca652ce5f00e891551225574b624dce2594253e8a254a8",
+      "decided_at": "2026-08-11T20:18:10.947613Z"
     },
     {
       "checkpoint": "pre-merge",
       "status": "approved",
-      "reviewer": "Newton Russell Demo Lead",
+      "reviewer": "Architect",
       "comments": "All 6 quality gates passed; diffs and tests approved for merge.",
-      "signature": "44b3f158ce7c31c808d011bc3c08495a91c5d5cfc42706965cafa87173356f83",
-      "decided_at": "2026-08-11T19:52:27.605552Z"
+      "signature": "b3bd341dba3dd7101e7b19ce65d71011c6f04b8ad7a97e1e9bbb78b479c8c04a",
+      "decided_at": "2026-08-11T20:18:14.117791Z"
     }
   ],
   "quality_results": {
-    "plan_id": "7524572d-1012-460e-b86e-d668ecb99ff0",
+    "plan_id": "924c06f9-409c-4a80-a339-5cb1f66377b3",
     "gates": [
       {
         "gate_name": "syntax",
@@ -285,7 +285,7 @@
         "details": "All 8 Python files parsed successfully with valid AST syntax.",
         "stdout": "",
         "stderr": "",
-        "duration_seconds": 0.0049
+        "duration_seconds": 0.0041
       },
       {
         "gate_name": "lint",
@@ -293,7 +293,7 @@
         "details": "All lint checks passed cleanly with Ruff.",
         "stdout": "All checks passed!",
         "stderr": "",
-        "duration_seconds": 0.0755
+        "duration_seconds": 0.0792
       },
       {
         "gate_name": "typecheck",
@@ -301,7 +301,7 @@
         "details": "Static type verification passed with Mypy.",
         "stdout": "",
         "stderr": "",
-        "duration_seconds": 2.1055
+        "duration_seconds": 2.1183
       },
       {
         "gate_name": "security",
@@ -315,9 +315,9 @@
         "gate_name": "pytest",
         "passed": true,
         "details": "All test suites executed and passed successfully.",
-        "stdout": "============================= test session starts =============================\ncollecting ... collected 3 items\n\nsandbox/demo_sandbox/tests/test_acceptance.py::test_acceptance_ac_001_token_consumption PASSED [ 33%]\nsandbox/demo_sandbox/tests/test_acceptance.py::test_acceptance_ac_002_burst_exhaustion PASSED [ 66%]\nsandbox/demo_sandbox/tests/test_acceptance.py::test_acceptance_ac_003_token_refill PASSED [100%]\n\n=============================== tests coverage ================================\n_______________ coverage: platform win32, python 3.14.0-final-0 _______________\n\nName                                           Stmts   Miss  Cover   Missing\n----------------------------------------------------------------------------\nspec_pipeline\\__init__.py                          0      0   100%\nspec_pipeline\\audit\\__init__.py                    4      4     0%   3-7\nspec_pipeline\\audit\\logger.py                     39     39     0%   3-122\nspec_pipeline\\audit\\provenance.py                 33     33     0%   3-130\nspec_pipeline\\audit\\reporter.py                  117    117     0%   3-529\nspec_pipeline\\cli.py                               4      4     0%   1-6\nspec_pipeline\\cli\\__init__.py                      2      2     0%   3-5\nspec_pipeline\\cli\\main.py                        113    113     0%   3-298\nspec_pipeline\\core\\__init__.py                     0      0   100%\nspec_pipeline\\core\\config.py                      32     32     0%   3-63\nspec_pipeline\\core\\exceptions.py                  24     24     0%   3-66\nspec_pipeline\\core\\models.py                     129    129     0%   13-307\nspec_pipeline\\governance\\__init__.py               3      3     0%   1-4\nspec_pipeline\\governance\\human_gate.py           104    104     0%   3-294\nspec_pipeline\\governance\\sandbox_policy.py        51     51     0%   3-140\nspec_pipeline\\implementation\\__init__.py           3      3     0%   3-6\nspec_pipeline\\implementation\\patch_engine.py      66     66     0%   3-143\nspec_pipeline\\implementation\\synthesizer.py       33     33     0%   3-110\nspec_pipeline\\llm\\__init__.py                     19     19     0%   12-59\nspec_pipeline\\llm\\base.py                         21     21     0%   3-41\nspec_pipeline\\llm\\gemini_provider.py              36     36     0%   3-87\nspec_pipeline\\llm\\json_util.py                    52     52     0%   7-97\nspec_pipeline\\llm\\mock_provider.py                42     42     0%   7-219\nspec_pipeline\\llm\\openai_provider.py              34     34     0%   3-78\nspec_pipeline\\llm\\prompt_templates.py             16     16     0%   9-159\nspec_pipeline\\orchestrator.py                    101    101     0%   3-261\nspec_pipeline\\planning\\__init__.py                 3      3     0%   3-6\nspec_pipeline\\planning\\planner.py                 82     82     0%   3-180\nspec_pipeline\\planning\\risk_analyzer.py           47     47     0%   10-179\nspec_pipeline\\quality_gates\\__init__.py            9      9     0%   3-12\nspec_pipeline\\quality_gates\\ac_gate.py            21     21     0%   3-57\nspec_pipeline\\quality_gates\\base.py               18     18     0%   3-54\nspec_pipeline\\quality_gates\\lint_gate.py          17     17     0%   3-62\nspec_pipeline\\quality_gates\\runner.py             26     26     0%   3-77\nspec_pipeline\\quality_gates\\security_gate.py      42     42     0%   3-119\nspec_pipeline\\quality_gates\\syntax_gate.py        22     22     0%   3-54\nspec_pipeline\\quality_gates\\test_gate.py          23     23     0%   3-75\nspec_pipeline\\quality_gates\\type_gate.py          17     17     0%   3-63\nspec_pipeline\\spec_intake\\__init__.py              0      0   100%\nspec_pipeline\\spec_intake\\parser.py              141    141     0%   7-280\nspec_pipeline\\spec_intake\\validator.py            51     51     0%   13-113\nspec_pipeline\\testing\\__init__.py                  3      3     0%   3-10\nspec_pipeline\\testing\\test_generator.py           67     67     0%   3-175\nspec_pipeline\\testing\\traceability.py             83     83     0%   7-172\n----------------------------------------------------------------------------\nTOTAL                                           1750   1750     0%\n============================== 3 passed in 0.26s ==============================",
+        "stdout": "============================= test session starts =============================\ncollecting ... collected 3 items\n\nsandbox/demo_sandbox/tests/test_acceptance.py::test_acceptance_ac_001_token_consumption PASSED [ 33%]\nsandbox/demo_sandbox/tests/test_acceptance.py::test_acceptance_ac_002_burst_exhaustion PASSED [ 66%]\nsandbox/demo_sandbox/tests/test_acceptance.py::test_acceptance_ac_003_token_refill PASSED [100%]\n\n=============================== tests coverage ================================\n_______________ coverage: platform win32, python 3.14.0-final-0 _______________\n\nName                                           Stmts   Miss  Cover   Missing\n----------------------------------------------------------------------------\nspec_pipeline\\__init__.py                          0      0   100%\nspec_pipeline\\__main__.py                          3      3     0%   3-6\nspec_pipeline\\audit\\__init__.py                    4      4     0%   3-7\nspec_pipeline\\audit\\logger.py                     39     39     0%   3-122\nspec_pipeline\\audit\\provenance.py                 33     33     0%   3-130\nspec_pipeline\\audit\\reporter.py                  117    117     0%   3-529\nspec_pipeline\\cli.py                               4      4     0%   1-6\nspec_pipeline\\cli\\__init__.py                      2      2     0%   3-5\nspec_pipeline\\cli\\__main__.py                      3      3     0%   3-6\nspec_pipeline\\cli\\main.py                        113    113     0%   3-298\nspec_pipeline\\core\\__init__.py                     0      0   100%\nspec_pipeline\\core\\config.py                      32     32     0%   3-63\nspec_pipeline\\core\\exceptions.py                  24     24     0%   3-66\nspec_pipeline\\core\\models.py                     129    129     0%   13-307\nspec_pipeline\\governance\\__init__.py               3      3     0%   1-4\nspec_pipeline\\governance\\human_gate.py           104    104     0%   3-294\nspec_pipeline\\governance\\sandbox_policy.py        51     51     0%   3-140\nspec_pipeline\\implementation\\__init__.py           3      3     0%   3-6\nspec_pipeline\\implementation\\patch_engine.py      66     66     0%   3-143\nspec_pipeline\\implementation\\synthesizer.py       33     33     0%   3-110\nspec_pipeline\\llm\\__init__.py                     19     19     0%   12-59\nspec_pipeline\\llm\\base.py                         21     21     0%   3-41\nspec_pipeline\\llm\\gemini_provider.py              36     36     0%   3-87\nspec_pipeline\\llm\\json_util.py                    52     52     0%   7-97\nspec_pipeline\\llm\\mock_provider.py                42     42     0%   7-219\nspec_pipeline\\llm\\openai_provider.py              34     34     0%   3-78\nspec_pipeline\\llm\\prompt_templates.py             16     16     0%   9-159\nspec_pipeline\\orchestrator.py                    101    101     0%   3-261\nspec_pipeline\\planning\\__init__.py                 3      3     0%   3-6\nspec_pipeline\\planning\\planner.py                 82     82     0%   3-180\nspec_pipeline\\planning\\risk_analyzer.py           47     47     0%   10-179\nspec_pipeline\\quality_gates\\__init__.py            9      9     0%   3-12\nspec_pipeline\\quality_gates\\ac_gate.py            21     21     0%   3-57\nspec_pipeline\\quality_gates\\base.py               18     18     0%   3-54\nspec_pipeline\\quality_gates\\lint_gate.py          17     17     0%   3-62\nspec_pipeline\\quality_gates\\runner.py             26     26     0%   3-77\nspec_pipeline\\quality_gates\\security_gate.py      42     42     0%   3-119\nspec_pipeline\\quality_gates\\syntax_gate.py        22     22     0%   3-54\nspec_pipeline\\quality_gates\\test_gate.py          23     23     0%   3-75\nspec_pipeline\\quality_gates\\type_gate.py          17     17     0%   3-63\nspec_pipeline\\spec_intake\\__init__.py              0      0   100%\nspec_pipeline\\spec_intake\\parser.py              141    141     0%   7-280\nspec_pipeline\\spec_intake\\validator.py            51     51     0%   13-113\nspec_pipeline\\testing\\__init__.py                  3      3     0%   3-10\nspec_pipeline\\testing\\test_generator.py           67     67     0%   3-175\nspec_pipeline\\testing\\traceability.py             83     83     0%   7-172\n----------------------------------------------------------------------------\nTOTAL                                           1756   1756     0%\n============================== 3 passed in 0.26s ==============================",
         "stderr": "C:\\Users\\Lenovo\\AppData\\Local\\Programs\\Python\\Python314\\Lib\\site-packages\\coverage\\control.py:963: CoverageWarning: No data was collected. (no-data-collected); see https://coverage.readthedocs.io/en/7.15.4/messages.html#warning-no-data-collected\n  self._warn(\"No data was collected.\", slug=\"no-data-collected\")",
-        "duration_seconds": 1.0455
+        "duration_seconds": 0.9631
       },
       {
         "gate_name": "acceptance_criteria",
@@ -329,8 +329,8 @@
       }
     ],
     "all_passed": true,
-    "executed_at": "2026-08-11T19:52:27.605512Z"
+    "executed_at": "2026-08-11T20:18:14.117753Z"
   },
-  "started_at": "2026-08-11T19:52:24.366510Z",
-  "completed_at": "2026-08-11T19:52:27.605976Z"
+  "started_at": "2026-08-11T20:18:10.946532Z",
+  "completed_at": "2026-08-11T20:18:14.117948Z"
 }

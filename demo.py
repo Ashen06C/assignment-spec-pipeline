@@ -1,4 +1,4 @@
-"""One-click executable demo script for the Newton Russell Spec-Driven Pipeline."""
+"""One-click executable demo script for the Spec-Driven Pipeline."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ def run_demo() -> None:
     console = Console()
     console.print(
         Panel.fit(
-            "[bold cyan]Newton Russell — AI-Native Spec-Driven Development Pipeline[/]\n"
+            "[bold cyan]AI-Native Spec-Driven Development Pipeline[/]\n"
             "[white]Autonomous End-to-End Lifecycle Execution Demo[/]",
             border_style="cyan",
         )
@@ -46,7 +46,7 @@ def run_demo() -> None:
         sandbox_dir=sandbox_dir,
         artifacts_dir=artifacts_dir,
         auto_approve=True,
-        reviewer="Newton Russell Demo Lead",
+        reviewer="Architect",
     )
 
     status_color = "green" if result.quality_results.all_passed else "red"

@@ -17,9 +17,9 @@
   "predicateType": "https://slsa.dev/provenance/v0.2",
   "predicate": {
     "builder": {
-      "id": "https://newtonrussell.ai/pipelines/spec-driven-v1"
+      "id": "https://spec-pipeline.ai/pipelines/v1"
     },
-    "buildType": "https://newtonrussell.ai/attestations/spec-driven-pipeline/v1",
+    "buildType": "https://spec-pipeline.ai/attestations/v1",
     "invocation": {
       "configSource": {
         "uri": "spec://token-bucket-rate-limiter",
@@ -28,8 +28,8 @@
         }
       },
       "parameters": {
-        "run_id": "427c7581-f332-4b5b-9c88-d747a599b158",
-        "spec_id": "6266fd35-0d57-4ce0-b8b3-93e268e1b007",
+        "run_id": "a19ad83a-3735-4c2e-9d96-35451dc9612c",
+        "spec_id": "e559ebcc-35f8-4433-b3cf-245da5928300",
         "spec_version": 1
       }
     },
@@ -42,8 +42,8 @@
       }
     ],
     "metadata": {
-      "buildStartedOn": "2026-08-11T19:52:24.366510+00:00",
-      "buildFinishedOn": "2026-08-11T19:52:27.605976+00:00",
+      "buildStartedOn": "2026-08-11T20:18:10.946532+00:00",
+      "buildFinishedOn": "2026-08-11T20:18:14.117948+00:00",
       "completeness": {
         "parameters": true,
         "environment": true,
@@ -55,16 +55,16 @@
       {
         "checkpoint": "pre-implementation",
         "status": "approved",
-        "reviewer": "Newton Russell Demo Lead",
-        "signature": "db38e82bb6c12176cc5c98995a398266d1871fbe85c810028ac77016e5572dde",
-        "decided_at": "2026-08-11T19:52:24.367568+00:00"
+        "reviewer": "Architect",
+        "signature": "3360742ddb0f0845c3ca652ce5f00e891551225574b624dce2594253e8a254a8",
+        "decided_at": "2026-08-11T20:18:10.947613+00:00"
       },
       {
         "checkpoint": "pre-merge",
         "status": "approved",
-        "reviewer": "Newton Russell Demo Lead",
-        "signature": "44b3f158ce7c31c808d011bc3c08495a91c5d5cfc42706965cafa87173356f83",
-        "decided_at": "2026-08-11T19:52:27.605552+00:00"
+        "reviewer": "Architect",
+        "signature": "b3bd341dba3dd7101e7b19ce65d71011c6f04b8ad7a97e1e9bbb78b479c8c04a",
+        "decided_at": "2026-08-11T20:18:14.117791+00:00"
       }
     ],
     "qualityVerification": {
@@ -73,17 +73,17 @@
         {
           "gate_name": "syntax",
           "passed": true,
-          "duration_seconds": 0.0049
+          "duration_seconds": 0.0041
         },
         {
           "gate_name": "lint",
           "passed": true,
-          "duration_seconds": 0.0755
+          "duration_seconds": 0.0792
         },
         {
           "gate_name": "typecheck",
           "passed": true,
-          "duration_seconds": 2.1055
+          "duration_seconds": 2.1183
         },
         {
           "gate_name": "security",
@@ -93,7 +93,7 @@
         {
           "gate_name": "pytest",
           "passed": true,
-          "duration_seconds": 1.0455
+          "duration_seconds": 0.9631
         },
         {
           "gate_name": "acceptance_criteria",

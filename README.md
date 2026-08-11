@@ -1,5 +1,4 @@
 # AI-Native, Spec-Driven Development Pipeline
-> **Newton Russell Technical Assessment**  
 > *Autonomous software lifecycle powered by formal specifications, AI synthesis, deterministic quality gates, and cryptographic governance.*
 
 [![CI Status](https://img.shields.io/badge/CI-Passing-brightgreen.svg)]()
@@ -28,7 +27,7 @@
 
 ## 🌟 Executive Summary
 
-At **Newton Russell**, software development transitions from informal prompt engineering to **deterministic, spec-driven engineering systems**. 
+Software development transitions from informal prompt engineering to **deterministic, spec-driven engineering systems**. 
 
 This repository implements a production-grade prototype development pipeline that ingests formal feature specifications in **Markdown, YAML, or JSON**, automatically reasons about architecture and risk, synthesizes implementation and test suites under **strict sandbox containment**, verifies code through **6 deterministic quality gates**, enforces **two-stage human cryptographic governance**, and seals every execution into **SLSA v0.2 In-Toto attestations** and **interactive visual dashboards**.
 
@@ -45,53 +44,37 @@ This repository implements a production-grade prototype development pipeline tha
 
 ## 🏗 End-to-End Architecture
 
-```mermaid
-flowchart TD
-    subgraph S1["Stage 1: Spec Intake & Validation"]
-        A["Feature Spec (.md, .yaml, .json)"] --> B["SpecParser & SHA-256 Fingerprint"]
-        B --> C{"SpecValidator\n6 Mandatory Sections"}
-        C -->|Valid| D["FeatureSpec Object"]
-        C -->|Invalid| ERR1["SpecValidationError"]
-    end
-
-    subgraph S2["Stage 2: Technical Planning & Risk Assessment"]
-        D --> E["Planner & LLM Engine"]
-        D --> F["RiskAnalyzer (concurrency, security, blast radius, perf)"]
-        E & F --> G["ImplementationPlan (Tasks DAG, ADRs, Blast Radius)"]
-    end
-
-    subgraph S3["Stage 3: Checkpoint #1 Pre-Implementation Governance"]
-        G --> H{"HumanApprovalGate\nReview Plan, DAG, Risks"}
-        H -->|Approved| I["HMAC-SHA256 Pre-Impl Token"]
-        H -->|Rejected| ERR2["ApprovalRejectedError"]
-    end
-
-    subgraph S4["Stage 4 & 5: Sandbox Synthesis & Test Generation"]
-        I --> J["CodeSynthesizer & PatchEngine\n(Sandbox Blast Radius Enforced)"]
-        J --> K["Synthesized Code (src/)"]
-        K --> L["TestGenerator (Unit, Integration, Acceptance)"]
-        L --> M["TraceabilityMatrixBuilder\n(100% AC Coverage Mapping)"]
-    end
-
-    subgraph S6["Stage 6: Deterministic Quality Verification"]
-        M --> N["QualityGateRunner"]
-        N --> G1["1. Syntax Gate (AST)"]
-        N --> G2["2. Lint Gate (Ruff)"]
-        N --> G3["3. Type Gate (Mypy)"]
-        N --> G4["4. Security Gate (AST + Secrets)"]
-        N --> G5["5. Pytest Runner (tests/)"]
-        N --> G6["6. AC Traceability Gate"]
-        G1 & G2 & G3 & G4 & G5 & G6 --> O{"All 6 Gates Passed?"}
-        O -->|No| ERR3["QualityGateFailureError"]
-    end
-
-    subgraph S7["Stage 7: Checkpoint #2 Pre-Merge & SLSA Attestation"]
-        O -->|Yes| P{"HumanApprovalGate\nReview Quality Evidence & Diffs"}
-        P -->|Approved| Q["HMAC-SHA256 Pre-Merge Token"]
-        Q --> R["SLSA v0.2 Provenance Generator (provenance.json)"]
-        Q --> S["Executive Markdown Report (audit_report.md)"]
-        Q --> T["Standalone Visual Dashboard (dashboard.html)"]
-    end
+```text
++---------------------------------------------------------------------------------------------------+
+|                                   SPEC-DRIVEN PIPELINE ARCHITECTURE                               |
++---------------------------------------------------------------------------------------------------+
+|                                                                                                   |
+|  [ Feature Spec (MD / YAML / JSON) ]                                                              |
+|         │                                                                                         |
+|         ▼                                                                                         |
+|  [ 1. Spec Intake & Validation ] ──► Compute SHA-256 Fingerprint & Validate 6 Mandatory Sections  |
+|         │                                                                                         |
+|         ▼                                                                                         |
+|  [ 2. Planning Agent ] ──────────► Technical Design, Task DAG, File Whitelist, Risk Mitigations   |
+|         │                                                                                         |
+|         ▼                                                                                         |
+|  [ 3. Governance Gate #1 ] ──────► Plan Review (Interactive UI / CLI Approval / HMAC Signature)   |
+|         │                                                                                         |
+|         ▼ (Approved)                                                                              |
+|  [ 4. Implementation Agent ] ────► Sandbox Policy Enforcer (Restricts to Approved Impacted Files) |
+|         │                                                                                         |
+|         ▼                                                                                         |
+|  [ 5. Test Synthesis Agent ] ────► Unit, Integration & Acceptance Tests (AC Traceability Matrix)   |
+|         │                                                                                         |
+|         ▼                                                                                         |
+|  [ 6. Deterministic Quality Gates] Multi-Gate Verification (AST, Lint, Mypy, Pytest, Security)   |
+|         │                                                                                         |
+|         ▼ (All Gates Pass)                                                                        |
+|  [ 7. Governance Gate #2 ] ──────► Pre-Merge Diff & Verification Review (HMAC-SHA256 Token)       |
+|         │                                                                                         |
+|         ▼ (Approved)                                                                              |
+|  [ 8. Audit & Provenance Generator ] Immutable Manifest, SLSA Provenance & HTML Dashboard         |
++---------------------------------------------------------------------------------------------------+
 ```
 
 ---
@@ -149,9 +132,16 @@ This executes all 7 stages on `examples/specs/token_bucket_limiter.yaml`, enforc
 - `artifacts/demo_run/provenance.json`
 - `artifacts/demo_run/audit_record_<id>.json`
 
+### 4. Interactive Web Studio UI
+Launch the embedded Web Studio with live 6-section schema validation and interactive Checkpoint #1 & #2 approval workflows:
+```bash
+python run_ui.py
+# Web Studio opens automatically at http://127.0.0.1:8000/
+```
+
 ---
 
-## 💻 CLI Reference
+## 💻 CLI & Web Studio Reference
 
 The pipeline includes a rich Typer CLI interface:
 
@@ -199,7 +189,7 @@ Every run produces standard `provenance.json`:
     }
   ],
   "predicate": {
-    "builder": { "id": "https://newtonrussell.ai/pipelines/spec-driven-v1" },
+    "builder": { "id": "https://spec.ai/pipelines/spec-driven-v1" },
     "materials": [
       {
         "uri": "spec://token-bucket-rate-limiter",
@@ -280,11 +270,3 @@ mypy spec_pipeline/ tests/ demo.py --ignore-missing-imports
 3. **Multi-File Refactoring Loops**: Adding iterative feedback loops where quality gate failures (e.g. Mypy type violations) are fed back to the LLM with error snippets for automatic self-repair.
 4. **Git Branch & PR Integration**: Automatically create feature branches, commit unified diffs, and open Pull Requests with the generated `audit_report.md` as the PR description.
 
----
-
-## 👥 Submission Information
-
-- **Candidate**: Newton Russell Talent Acquisition Candidate
-- **Repository**: [assignment-spec-pipeline](https://github.com/Ashen06C/assignment-spec-pipeline)
-- **Target OS & Runtime**: Windows / Linux / macOS — Python 3.11, 3.12, 3.13, 3.14
-- **License**: MIT

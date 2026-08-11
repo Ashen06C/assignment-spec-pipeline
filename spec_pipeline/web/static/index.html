@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spec-Driven Pipeline Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="navbar-brand">
+      <span class="brand-logo">SDP</span>
+      <h1 class="brand-title">Spec-Driven Pipeline</h1>
+    </div>
+    <div class="navbar-status">
+      <span class="model-status-pill" id="headerModelStatus">
+        <span class="status-dot"></span>
+        <span id="activeModelLabel">Deterministic Mock (Offline)</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Viewport Layout -->
+  <main class="studio-container">
+    <!-- Left Panel: Spec Studio -->
+    <section class="spec-studio-panel">
+      <div class="panel-header-row">
+        <h2 class="panel-title">Spec Studio</h2>
+        <div class="template-selector-group">
+          <label for="templateSelect">Template:</label>
+          <select id="templateSelect" class="select-control">
+            <option value="" disabled selected>Select Spec Template...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Editor Box -->
+      <div class="editor-wrapper">
+        <textarea id="specEditor" class="spec-textarea" spellcheck="false" placeholder="Enter formal specification in YAML, Markdown, or JSON..."></textarea>
+      </div>
+
+      <!-- 6-Section Validation Checklist -->
+      <div class="checklist-container">
+        <div class="checklist-row">
+          <span class="check-item" data-section="objective"><span class="check-mark">✓</span> Objective</span>
+          <span class="check-item" data-section="user_stories"><span class="check-mark">✓</span> User Story</span>
+          <span class="check-item" data-section="business_rules"><span class="check-mark">✓</span> Business Rules</span>
+        </div>
+        <div class="checklist-row">
+          <span class="check-item" data-section="acceptance_criteria"><span class="check-mark">✓</span> Acceptance Criteria</span>
+          <span class="check-item" data-section="non_functional_requirements"><span class="check-mark">✓</span> NFRs</span>
+          <span class="check-item" data-section="out_of_scope"><span class="check-mark">✓</span> Out of Scope</span>
+        </div>
+      </div>
+
+      <!-- Bottom Controls -->
+      <div class="controls-container">
+        <div class="form-group">
+          <label for="providerModelSelect">AI Model & Provider:</label>
+          <select id="providerModelSelect" class="select-control full-width">
+            <option value="mock" selected>Deterministic Mock Engine (Offline / Fast)</option>
+            <option value="gemini">Google Gemini (gemini-2.5-flash)</option>
+            <option value="openai">OpenAI (gpt-4o)</option>
+          </select>
+        </div>
+
+        <div class="checkbox-row">
+          <label class="custom-checkbox">
+            <input type="checkbox" id="chkGovernanceMode" checked>
+            <span class="checkbox-box"></span>
+            <span class="checkbox-label">Human Governance Mode (Require Approval Checkpoints)</span>
+          </label>
+        </div>
+
+        <div class="action-btn-row">
+          <button id="btnValidate" class="btn btn-outline">
+            <span class="btn-icon">🔍</span> Validate Spec
+          </button>
+          <button id="btnPlanOnly" class="btn btn-outline">
+            <span class="btn-icon">📐</span> Generate Plan Only
+          </button>
+        </div>
+
+        <button id="btnExecute" class="btn btn-primary full-width">
+          <span class="btn-icon">🚀</span> <span id="executeBtnText">Execute Pipeline</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Right Panel: Results Hub -->
+    <section class="results-hub-panel">
+      <!-- Top Tab Navigation -->
+      <nav class="tabs-nav">
+        <button class="tab-link active" data-tab="tabOverview">Overview & Plan</button>
+        <button class="tab-link" data-tab="tabCode">Code & Diffs</button>
+        <button class="tab-link" data-tab="tabTests">Tests & Traceability</button>
+        <button class="tab-link" data-tab="tabGates">Quality Gates</button>
+        <button class="tab-link" data-tab="tabProvenance">SLSA Provenance</button>
+      </nav>
+
+      <!-- Scrollable Tab Content Viewport -->
+      <div class="tab-content-area">
+        <!-- Dynamic Governance Checkpoint Card (Visible during awaiting review) -->
+        <div id="govCard" class="governance-card" style="display: none;">
+          <div class="gov-header">
+            <div class="gov-badge-title">
+              <span class="gov-checkpoint-pill" id="govCheckpointPill">GOVERNANCE CHECKPOINT #1</span>
+              <h3 class="gov-title" id="govTitle">Pre-Implementation Plan Review</h3>
+            </div>
+            <span class="gov-status-pill" id="govStatusPill">Awaiting Approval</span>
+          </div>
+          <p class="gov-desc" id="govDesc">
+            Review the technical plan, task breakdown, approved blast radius, and risk mitigations. Authorize AI code synthesis into the isolated sandbox.
+          </p>
+
+          <div class="gov-meta-box">
+            <span class="meta-item">Plan ID: <strong id="govPlanId">PLAN-1A2B3C4D</strong></span>
+            <span class="meta-item">Reviewer: <input type="text" id="govReviewerInput" class="inline-input" value="Lead_Architect"></span>
+          </div>
+
+          <div class="gov-buttons-row">
+            <button id="btnApproveGov" class="btn btn-success">
+              <span class="btn-icon">✓</span> <span id="approveBtnLabel">Approve Plan & Begin Implementation</span>
+            </button>
+            <button id="btnRejectGov" class="btn btn-danger-outline">
+              <span class="btn-icon">✗</span> Reject Plan
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Metric Cards Summary Bar -->
+        <div class="metrics-grid" id="metricsGrid">
+          <div class="metric-card">
+            <span class="metric-label">SPEC FINGERPRINT</span>
+            <span class="metric-value font-mono font-sm text-blue" id="metricHash">Pending</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">TASKS GENERATED</span>
+            <span class="metric-value text-blue" id="metricTasks">0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">IMPACTED FILES</span>
+            <span class="metric-value text-blue" id="metricFiles">0</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">EVALUATED RISKS</span>
+            <span class="metric-value text-blue" id="metricRisks">0</span>
+          </div>
+        </div>
+
+        <!-- TAB 1: Overview & Plan -->
+        <div id="tabOverview" class="tab-pane active">
+          <!-- Architecture Section -->
+          <div class="section-block">
+            <h4 class="section-heading">
+              <span class="heading-icon">🏛</span> Technical Design Architecture
+            </h4>
+            <p class="section-body-text" id="archDesignSummary">
+              No technical architecture generated yet. Load a specification template and click <b>Generate Plan Only</b> or <b>Execute Pipeline</b>.
+            </p>
+            <div class="decision-pills-list" id="archDecisionsList"></div>
+          </div>
+
+          <!-- Decomposed Task DAG Section -->
+          <div class="section-block">
+            <h4 class="section-heading">
+              <span class="heading-icon">📜</span> Decomposed Task DAG
+            </h4>
+            <div class="tasks-list" id="tasksList">
+              <div class="empty-placeholder">No implementation tasks generated yet.</div>
+            </div>
+          </div>
+
+          <!-- Risk Assessment Table Section -->
+          <div class="section-block">
+            <h4 class="section-heading">
+              <span class="heading-icon">🛡</span> Evaluated Risk Considerations & Mitigations
+            </h4>
+            <table class="styled-table" id="risksTable">
+              <thead>
+                <tr>
+                  <th style="width: 90px;">Risk ID</th>
+                  <th style="width: 130px;">Category</th>
+                  <th>Identified Risk Description</th>
+                  <th>Actionable Mitigation Strategy</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4" class="empty-placeholder">No risks evaluated yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: Code & Diffs -->
+        <div id="tabCode" class="tab-pane">
+          <div class="code-split-view">
+            <div class="files-tree-panel">
+              <div class="files-tree-header">Synthesized Files</div>
+              <ul class="files-tree-list" id="synthesizedFilesTree">
+                <li class="empty-placeholder">No code synthesized yet.</li>
+              </ul>
+            </div>
+            <div class="code-viewer-panel">
+              <div class="code-viewer-header">
+                <span class="viewer-filename" id="viewerFileName">Select a file to inspect</span>
+                <span class="action-tag" id="viewerFileAction"></span>
+              </div>
+              <pre class="code-viewport" id="diffViewport"><code>Synthesized code modifications and unified diffs will appear here.</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: Tests & Traceability -->
+        <div id="tabTests" class="tab-pane">
+          <div class="section-block">
+            <div class="section-header-split">
+              <h4 class="section-heading">
+                <span class="heading-icon">🎯</span> Bidirectional Acceptance Criteria Traceability Matrix
+              </h4>
+              <span class="badge badge-success" id="traceabilityScoreBadge">100% Coverage Target</span>
+            </div>
+            <table class="styled-table" id="traceabilityMatrixTable">
+              <thead>
+                <tr>
+                  <th style="width: 110px;">Criterion ID</th>
+                  <th>Acceptance Requirement</th>
+                  <th>Mapped Test Function(s)</th>
+                  <th style="width: 100px;">Coverage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4" class="empty-placeholder">Traceability matrix not generated yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section-block">
+            <h4 class="section-heading">
+              <span class="heading-icon">🧪</span> Synthesized Executable Pytest Test Suites
+            </h4>
+            <pre class="code-viewport" id="testsCodeViewport"><code>Synthesized test suites will appear here.</code></pre>
+          </div>
+        </div>
+
+        <!-- TAB 4: Quality Gates -->
+        <div id="tabGates" class="tab-pane">
+          <div class="gates-cards-grid" id="gatesGrid">
+            <!-- Gate 1: Syntax -->
+            <div class="gate-card" id="gateCard-syntax">
+              <div class="gate-card-top">
+                <span class="gate-title">1. AST Syntax Gate</span>
+                <span class="gate-pill pill-pending">PENDING</span>
+              </div>
+              <p class="gate-info">Parses Python AST syntax trees ensuring compilation integrity.</p>
+              <div class="gate-timing">Duration: <span class="gate-duration-val">—</span></div>
+              <div class="gate-log-box" style="display: none;"></div>
+            </div>
+
+            <!-- Gate 2: Lint -->
+            <div class="gate-card" id="gateCard-lint">
+              <div class="gate-card-top">
+                <span class="gate-title">2. Ruff Linter Gate</span>
+                <span class="gate-pill pill-pending">PENDING</span>
+              </div>
+              <p class="gate-info">Enforces PEP8 and Pyflakes static code conventions via Ruff.</p>
+              <div class="gate-timing">Duration: <span class="gate-duration-val">—</span></div>
+              <div class="gate-log-box" style="display: none;"></div>
+            </div>
+
+            <!-- Gate 3: Typecheck -->
+            <div class="gate-card" id="gateCard-typecheck">
+              <div class="gate-card-top">
+                <span class="gate-title">3. Mypy Type Gate</span>
+                <span class="gate-pill pill-pending">PENDING</span>
+              </div>
+              <p class="gate-info">Strict static type analysis verifying type annotations and contracts.</p>
+              <div class="gate-timing">Duration: <span class="gate-duration-val">—</span></div>
+              <div class="gate-log-box" style="display: none;"></div>
+            </div>
+
+            <!-- Gate 4: Security -->
+            <div class="gate-card" id="gateCard-security">
+              <div class="gate-card-top">
+                <span class="gate-title">4. AST Security Scanner</span>
+                <span class="gate-pill pill-pending">PENDING</span>
+              </div>
+              <p class="gate-info">Detects dangerous AST primitives (eval/exec) and hardcoded secrets.</p>
+              <div class="gate-timing">Duration: <span class="gate-duration-val">—</span></div>
+              <div class="gate-log-box" style="display: none;"></div>
+            </div>
+
+            <!-- Gate 5: Pytest -->
+            <div class="gate-card" id="gateCard-pytest">
+              <div class="gate-card-top">
+                <span class="gate-title">5. Pytest Execution Gate</span>
+                <span class="gate-pill pill-pending">PENDING</span>
+              </div>
+              <p class="gate-info">Executes unit, integration, and acceptance tests in isolated sandbox.</p>
+              <div class="gate-timing">Duration: <span class="gate-duration-val">—</span></div>
+              <div class="gate-log-box" style="display: none;"></div>
+            </div>
+
+            <!-- Gate 6: AC Coverage -->
+            <div class="gate-card" id="gateCard-acceptance_criteria">
+              <div class="gate-card-top">
+                <span class="gate-title">6. 100% AC Coverage Gate</span>
+                <span class="gate-pill pill-pending">PENDING</span>
+              </div>
+              <p class="gate-info">Guarantees zero unmapped or orphaned acceptance criteria.</p>
+              <div class="gate-timing">Duration: <span class="gate-duration-val">—</span></div>
+              <div class="gate-log-box" style="display: none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: SLSA Provenance -->
+        <div id="tabProvenance" class="tab-pane">
+          <div class="section-block">
+            <h4 class="section-heading">
+              <span class="heading-icon">🔏</span> Immutable HMAC-SHA256 Governance Signatures
+            </h4>
+            <table class="styled-table" id="provenanceSignaturesTable">
+              <thead>
+                <tr>
+                  <th style="width: 140px;">Checkpoint</th>
+                  <th style="width: 110px;">Status</th>
+                  <th>Reviewer Identity</th>
+                  <th>Timestamp</th>
+                  <th>Cryptographic Signature Token</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="5" class="empty-placeholder">No signatures recorded yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="section-block">
+            <div class="section-header-split">
+              <h4 class="section-heading">
+                <span class="heading-icon">📦</span> In-Toto SLSA v0.2 Provenance Attestation (JSON)
+              </h4>
+              <div class="artifact-links-row">
+                <a id="linkLiveDashboard" href="#" target="_blank" class="btn btn-sm btn-outline" style="display: none;">
+                  ↗ Open Visual Dashboard
+                </a>
+                <a id="linkLiveReport" href="#" target="_blank" class="btn btn-sm btn-outline" style="display: none;">
+                  ↗ Open Markdown Report
+                </a>
+              </div>
+            </div>
+            <pre class="code-viewport" id="provenanceJsonViewport"><code>SLSA provenance statement will appear here upon completion.</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toastRoot" class="toast-root"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

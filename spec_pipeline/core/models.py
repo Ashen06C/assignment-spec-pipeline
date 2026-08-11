@@ -91,7 +91,7 @@ class FeatureSpec(BaseModel):
     created_at: datetime = Field(default_factory=_utcnow)
     spec_hash: str = Field(default="", description="SHA-256 fingerprint of raw spec content")
 
-    # All 6 mandatory sections per the Newton Russell specification standard.
+    # All 6 mandatory sections per the specification standard.
     REQUIRED_SECTIONS: frozenset[str] = frozenset(
         {
             "objective",

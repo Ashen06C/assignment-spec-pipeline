@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 class SLSAProvenanceBuilder:
     """Generates verifiable In-Toto / SLSA v0.2 provenance attestations for synthesized assets."""
 
-    BUILDER_ID = "https://newtonrussell.ai/pipelines/spec-driven-v1"
-    BUILD_TYPE = "https://newtonrussell.ai/attestations/spec-driven-pipeline/v1"
+    BUILDER_ID = "https://spec-pipeline.ai/pipelines/v1"
+    BUILD_TYPE = "https://spec-pipeline.ai/attestations/v1"
 
     def generate_provenance(
         self,
