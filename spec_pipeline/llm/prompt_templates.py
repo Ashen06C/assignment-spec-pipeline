@@ -25,6 +25,7 @@ commentary outside the JSON). Follow the schema exactly."""
 PLANNING_JSON_SCHEMA = """\
 {
   "technical_summary": "<string – 2-4 sentence design overview>",
+  "architecture_decisions": ["<ADR / key design choice 1>", "<ADR 2>"],
   "tasks": [
     {
       "task_id": "TASK-NNN",
@@ -32,7 +33,8 @@ PLANNING_JSON_SCHEMA = """\
       "description": "<string>",
       "priority": "low | medium | high | critical",
       "estimated_effort": "<string, e.g. '2h'>",
-      "dependencies": ["TASK-NNN"]
+      "dependencies": ["TASK-NNN"],
+      "target_files": ["<target file path>"]
     }
   ],
   "impacted_modules": ["<module path>"],
@@ -40,6 +42,7 @@ PLANNING_JSON_SCHEMA = """\
   "risks": [
     {
       "risk_id": "RISK-NNN",
+      "category": "concurrency | security | blast_radius | performance | general",
       "description": "<string>",
       "likelihood": "low | medium | high",
       "impact": "low | medium | high",

@@ -74,6 +74,11 @@ class MockProvider(BaseLLMProvider):
                 "input validation, persistence layer integration, and comprehensive "
                 "error handling. The design follows hexagonal architecture principles."
             ),
+            "architecture_decisions": [
+                "ADR-001: Implement modular service layer with explicit dependency injection",
+                "ADR-002: Use Pydantic v2 schemas for strict input validation and serialization",
+                "ADR-003: Isolate state management to approved storage interface",
+            ],
             "tasks": [
                 {
                     "task_id": "TASK-001",
@@ -85,6 +90,7 @@ class MockProvider(BaseLLMProvider):
                     "priority": "high",
                     "estimated_effort": "2h",
                     "dependencies": [],
+                    "target_files": ["src/models/feature.py"],
                 },
                 {
                     "task_id": "TASK-002",
@@ -96,6 +102,7 @@ class MockProvider(BaseLLMProvider):
                     "priority": "high",
                     "estimated_effort": "3h",
                     "dependencies": ["TASK-001"],
+                    "target_files": ["src/services/feature_service.py"],
                 },
                 {
                     "task_id": "TASK-003",
@@ -107,6 +114,7 @@ class MockProvider(BaseLLMProvider):
                     "priority": "medium",
                     "estimated_effort": "2h",
                     "dependencies": ["TASK-002"],
+                    "target_files": ["src/api/feature_routes.py"],
                 },
             ],
             "impacted_modules": ["src/models", "src/services", "src/api"],
@@ -118,6 +126,7 @@ class MockProvider(BaseLLMProvider):
             "risks": [
                 {
                     "risk_id": "RISK-001",
+                    "category": "performance",
                     "description": (
                         "Integration with external dependencies may introduce latency."
                     ),

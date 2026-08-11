@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
 import yaml
@@ -31,7 +32,7 @@ def validator() -> SpecValidator:
     return SpecValidator()
 
 
-def _valid_spec_dict() -> dict:
+def _valid_spec_dict() -> dict[str, Any]:
     """Minimal valid spec as a plain dict (all 6 sections present)."""
     return {
         "title": "Test Feature",

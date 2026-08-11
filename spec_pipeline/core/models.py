@@ -122,12 +122,19 @@ class DecomposedTask(BaseModel):
     dependencies: list[str] = Field(
         default_factory=list, description="IDs of tasks this depends on"
     )
+    target_files: list[str] = Field(
+        default_factory=list, description="Target file paths affected or created by this task"
+    )
 
 
 class EvaluatedRisk(BaseModel):
     """A risk identified during planning."""
 
     risk_id: str
+    category: str = Field(
+        default="general",
+        description="Risk category: concurrency | security | blast_radius | performance | general",
+    )
     description: str
     likelihood: str = Field(description="low | medium | high")
     impact: str = Field(description="low | medium | high")
@@ -152,6 +159,9 @@ class ImplementationPlan(BaseModel):
     spec_id: UUID
     tasks: list[DecomposedTask] = Field(min_length=1)
     technical_summary: str
+    architecture_decisions: list[str] = Field(
+        default_factory=list, description="Key architecture decisions / design choices (ADRs)"
+    )
     impacted_modules: list[str] = Field(default_factory=list)
     impacted_files: list[str] = Field(default_factory=list)
     risks: list[EvaluatedRisk] = Field(default_factory=list)

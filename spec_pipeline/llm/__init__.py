@@ -12,10 +12,12 @@ Usage::
 from __future__ import annotations
 
 from spec_pipeline.llm.base import BaseLLMProvider, LLMConfig, TokenUsage
+from spec_pipeline.llm.mock_provider import MockProvider
 
 __all__ = [
     "BaseLLMProvider",
     "LLMConfig",
+    "MockProvider",
     "TokenUsage",
     "get_llm_provider",
 ]
