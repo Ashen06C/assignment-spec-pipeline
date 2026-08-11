@@ -1,0 +1,106 @@
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [
+    {
+      "name": "src/models/feature.py",
+      "digest": {
+        "sha256": "461178dd5d67ff0a0b4eb187bb0cff612d4c7fe91400141b14407533d56e5c86"
+      }
+    },
+    {
+      "name": "src/services/feature_service.py",
+      "digest": {
+        "sha256": "0797859c44be35867c409de526a48e7aa9626faa9bfcbcc40867a8719736087f"
+      }
+    }
+  ],
+  "predicateType": "https://slsa.dev/provenance/v0.2",
+  "predicate": {
+    "builder": {
+      "id": "https://newtonrussell.ai/pipelines/spec-driven-v1"
+    },
+    "buildType": "https://newtonrussell.ai/attestations/spec-driven-pipeline/v1",
+    "invocation": {
+      "configSource": {
+        "uri": "spec://token-bucket-rate-limiter",
+        "digest": {
+          "sha256": "dce911408b6b924c0aa93d572e839d4099914820b34b8519ef682e53d96abea6"
+        }
+      },
+      "parameters": {
+        "run_id": "427c7581-f332-4b5b-9c88-d747a599b158",
+        "spec_id": "6266fd35-0d57-4ce0-b8b3-93e268e1b007",
+        "spec_version": 1
+      }
+    },
+    "materials": [
+      {
+        "uri": "spec://token-bucket-rate-limiter",
+        "digest": {
+          "sha256": "dce911408b6b924c0aa93d572e839d4099914820b34b8519ef682e53d96abea6"
+        }
+      }
+    ],
+    "metadata": {
+      "buildStartedOn": "2026-08-11T19:52:24.366510+00:00",
+      "buildFinishedOn": "2026-08-11T19:52:27.605976+00:00",
+      "completeness": {
+        "parameters": true,
+        "environment": true,
+        "materials": true
+      },
+      "reproducible": true
+    },
+    "approvals": [
+      {
+        "checkpoint": "pre-implementation",
+        "status": "approved",
+        "reviewer": "Newton Russell Demo Lead",
+        "signature": "db38e82bb6c12176cc5c98995a398266d1871fbe85c810028ac77016e5572dde",
+        "decided_at": "2026-08-11T19:52:24.367568+00:00"
+      },
+      {
+        "checkpoint": "pre-merge",
+        "status": "approved",
+        "reviewer": "Newton Russell Demo Lead",
+        "signature": "44b3f158ce7c31c808d011bc3c08495a91c5d5cfc42706965cafa87173356f83",
+        "decided_at": "2026-08-11T19:52:27.605552+00:00"
+      }
+    ],
+    "qualityVerification": {
+      "all_passed": true,
+      "gates": [
+        {
+          "gate_name": "syntax",
+          "passed": true,
+          "duration_seconds": 0.0049
+        },
+        {
+          "gate_name": "lint",
+          "passed": true,
+          "duration_seconds": 0.0755
+        },
+        {
+          "gate_name": "typecheck",
+          "passed": true,
+          "duration_seconds": 2.1055
+        },
+        {
+          "gate_name": "security",
+          "passed": true,
+          "duration_seconds": 0.002
+        },
+        {
+          "gate_name": "pytest",
+          "passed": true,
+          "duration_seconds": 1.0455
+        },
+        {
+          "gate_name": "acceptance_criteria",
+          "passed": true,
+          "duration_seconds": 0.0001
+        }
+      ]
+    }
+  }
+}

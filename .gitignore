@@ -28,3 +28,12 @@ coverage.xml
 # ----- Pipeline artefacts (transient) -----
 pipeline_runs/
 sandbox_workdir/
+
+# ----- Sandboxes & Ephemeral Workdirs -----
+sandbox/
+sandbox_test/
+sandbox_*/
+
+# ----- Transient test artifacts (keep demo_run if desired) -----
+artifacts/cli_test/
+

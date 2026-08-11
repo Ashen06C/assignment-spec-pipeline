@@ -199,7 +199,7 @@ class MockProvider(BaseLLMProvider):
                         "class FeatureService:\n"
                         f'    """Business logic for {title}."""\n\n'
                         "    def process(self, request: FeatureRequest)"
-                        " -> dict:\n"
+                        " -> dict[str, str]:\n"
                         '        """Process a feature request."""\n'
                         "        if not request.name:\n"
                         '            raise ValueError("Name is required")\n'

@@ -41,6 +41,7 @@ class TypeGate(BaseQualityGate):
             "mypy",
             "--allow-untyped-defs",
             "--ignore-missing-imports",
+            "--explicit-package-bases",
             "--no-error-summary",
             str(sandbox_root),
         ]

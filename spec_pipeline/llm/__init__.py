@@ -23,35 +23,40 @@ __all__ = [
 ]
 
 
-def get_llm_provider(config: LLMConfig) -> BaseLLMProvider:
-    """Instantiate the correct LLM provider from *config*.
+def get_llm_provider(
+    config: LLMConfig | None = None,
+    provider_type: str | None = None,
+    api_key: str | None = None,
+    model_name: str | None = None,
+) -> BaseLLMProvider:
+    """Instantiate the correct LLM provider from *config* or keyword arguments."""
+    if config is None:
+        cfg = LLMConfig(
+            provider=provider_type or "mock",
+            model=model_name or ("mock-model" if (provider_type or "mock") == "mock" else ""),
+            api_key=api_key or "",
+        )
+    else:
+        cfg = config
 
-    Providers are imported lazily so that optional SDK dependencies
-    are only required when their provider is actually selected.
-
-    Raises
-    ------
-    ValueError
-        If ``config.provider`` is not a recognised provider name.
-    """
-    provider = config.provider.lower()
+    provider = cfg.provider.lower()
 
     if provider == "gemini":
         from spec_pipeline.llm.gemini_provider import GeminiProvider
 
-        return GeminiProvider(config)
+        return GeminiProvider(cfg)
 
     if provider == "openai":
         from spec_pipeline.llm.openai_provider import OpenAIProvider
 
-        return OpenAIProvider(config)
+        return OpenAIProvider(cfg)
 
     if provider == "mock":
         from spec_pipeline.llm.mock_provider import MockProvider
 
-        return MockProvider(config)
+        return MockProvider(cfg)
 
     raise ValueError(
-        f"Unknown LLM provider: {config.provider!r}. "
+        f"Unknown LLM provider: {cfg.provider!r}. "
         "Supported: 'gemini', 'openai', 'mock'."
     )

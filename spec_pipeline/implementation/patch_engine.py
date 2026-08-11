@@ -99,6 +99,15 @@ class PatchEngine:
 
         if action in {"create", "modify"}:
             target_file.parent.mkdir(parents=True, exist_ok=True)
+            # Ensure package markers exist in all intermediate package subdirectories
+            curr = target_file.parent
+            while curr != target_file.parent.parent.parent and curr.is_dir():
+                init_py = curr / "__init__.py"
+                if not init_py.is_file():
+                    init_py.write_text("", encoding="utf-8")
+                if curr.name in {"src", "tests", "."}:
+                    break
+                curr = curr.parent
             target_file.write_text(new_content, encoding="utf-8")
             diff_summary = change.diff_summary or (
                 f"Created {change.path}" if action == "create" else f"Modified {change.path}"
