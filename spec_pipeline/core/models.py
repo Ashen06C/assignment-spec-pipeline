@@ -41,9 +41,9 @@ def _new_uuid() -> UUID:
 class UserStory(BaseModel):
     """Single user story expressed in *As a … I want … So that …* form."""
 
-    persona: str = Field(..., description="The user role (e.g. 'admin', 'shopper')")
-    action: str = Field(..., description="What the user wants to do")
-    benefit: str = Field(..., description="The expected benefit")
+    as_a: str = Field(..., description="The user role (e.g. 'admin', 'shopper')")
+    i_want: str = Field(..., description="What the user wants to do")
+    so_that: str = Field(..., description="The expected benefit")
 
 
 class BusinessRule(BaseModel):
@@ -57,6 +57,7 @@ class AcceptanceCriterion(BaseModel):
     """A single testable acceptance criterion."""
 
     criterion_id: str = Field(..., description="Short identifier, e.g. AC-001")
+    title: str = Field(..., description="Short human-readable title")
     given: str = Field(..., description="Precondition")
     when: str = Field(..., description="Action / trigger")
     then: str = Field(..., description="Expected outcome")
@@ -83,19 +84,22 @@ class FeatureSpec(BaseModel):
     title: str
     objective: str
     user_stories: list[UserStory] = Field(min_length=1)
-    business_rules: list[BusinessRule] = Field(default_factory=list)
+    business_rules: list[BusinessRule] = Field(min_length=1)
     acceptance_criteria: list[AcceptanceCriterion] = Field(min_length=1)
-    non_functional_requirements: list[NonFunctionalRequirement] = Field(default_factory=list)
-    out_of_scope: list[str] = Field(default_factory=list)
+    non_functional_requirements: list[NonFunctionalRequirement] = Field(min_length=1)
+    out_of_scope: list[str] = Field(min_length=1)
     created_at: datetime = Field(default_factory=_utcnow)
+    spec_hash: str = Field(default="", description="SHA-256 fingerprint of raw spec content")
 
-    # Required sections that the validator checks for completeness.
+    # All 6 mandatory sections per the Newton Russell specification standard.
     REQUIRED_SECTIONS: frozenset[str] = frozenset(
         {
-            "title",
             "objective",
             "user_stories",
+            "business_rules",
             "acceptance_criteria",
+            "non_functional_requirements",
+            "out_of_scope",
         }
     )
 

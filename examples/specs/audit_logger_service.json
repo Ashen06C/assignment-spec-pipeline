@@ -1,0 +1,82 @@
+{
+  "title": "Audit Logger Service",
+  "objective": "Build a centralised audit-logging service that captures, stores, and indexes security-relevant events across all micro-services, enabling compliance reporting and forensic investigation.",
+  "user_stories": [
+    {
+      "as_a": "compliance officer",
+      "i_want": "to query audit logs by actor, resource, and time range",
+      "so_that": "I can produce regulatory compliance reports within minutes"
+    },
+    {
+      "as_a": "security incident responder",
+      "i_want": "immutable, tamper-evident audit records",
+      "so_that": "I can trust log integrity during forensic investigations"
+    },
+    {
+      "as_a": "platform engineer",
+      "i_want": "a simple SDK that micro-services can integrate in under 30 minutes",
+      "so_that": "adoption friction is minimised across teams"
+    }
+  ],
+  "business_rules": [
+    {
+      "rule_id": "BR-001",
+      "description": "Every audit event must include: timestamp, actor_id, action, resource, outcome, and source_service."
+    },
+    {
+      "rule_id": "BR-002",
+      "description": "Audit records must be append-only — no update or delete operations are permitted."
+    },
+    {
+      "rule_id": "BR-003",
+      "description": "Events must be retained for a minimum of 7 years to satisfy SOC-2 and GDPR requirements."
+    },
+    {
+      "rule_id": "BR-004",
+      "description": "PII fields must be encrypted at rest using AES-256 with envelope encryption."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "criterion_id": "AC-001",
+      "title": "Event ingestion",
+      "given": "A valid audit event payload from a registered micro-service",
+      "when": "The event is submitted to the /events endpoint",
+      "then": "The event is persisted and an event_id is returned within 50ms at p99"
+    },
+    {
+      "criterion_id": "AC-002",
+      "title": "Tamper detection",
+      "given": "A stored audit record",
+      "when": "An attempt is made to modify the record directly in the database",
+      "then": "The integrity check fails and an alert is raised"
+    },
+    {
+      "criterion_id": "AC-003",
+      "title": "Query by time range",
+      "given": "1 million stored audit events",
+      "when": "A compliance officer queries events for a specific actor within a 24-hour window",
+      "then": "Results are returned within 2 seconds"
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "category": "performance",
+      "description": "Ingestion throughput must sustain 10,000 events per second with no data loss",
+      "threshold": "10k eps"
+    },
+    {
+      "category": "security",
+      "description": "All inter-service communication must use mTLS; the audit service must not log raw credentials or tokens"
+    },
+    {
+      "category": "durability",
+      "description": "Zero data loss under single-node failure — replication factor of at least 3"
+    }
+  ],
+  "out_of_scope": [
+    "Real-time alerting on audit events (handled by a separate SIEM integration)",
+    "Audit log export to third-party SaaS platforms",
+    "User-facing audit-log viewer UI"
+  ]
+}

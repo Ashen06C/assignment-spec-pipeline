@@ -1,0 +1,64 @@
+title: Token Bucket Rate Limiter
+objective: >
+  Implement a token-bucket algorithm as the core rate-limiting strategy,
+  supporting configurable burst capacity and steady-state refill rates
+  for fine-grained traffic shaping.
+
+user_stories:
+  - as_a: API gateway administrator
+    i_want: to configure both burst capacity and refill rate per API key
+    so_that: legitimate traffic bursts are allowed while sustained abuse is throttled
+  - as_a: backend service owner
+    i_want: the token bucket to integrate with our existing Redis cluster
+    so_that: no additional infrastructure is required for state management
+
+business_rules:
+  - rule_id: BR-001
+    description: >
+      Each API key is assigned a token bucket with a configurable maximum
+      capacity (default 100 tokens) and a refill rate (default 10 tokens/second).
+  - rule_id: BR-002
+    description: >
+      Tokens are consumed atomically — a request that would cause a negative
+      balance must be rejected rather than partially consuming tokens.
+  - rule_id: BR-003
+    description: >
+      Bucket state must be persisted in Redis with a TTL equal to
+      twice the full-refill duration to prevent stale key accumulation.
+
+acceptance_criteria:
+  - criterion_id: AC-001
+    title: Token consumption
+    given: A bucket with 10 remaining tokens
+    when: A request consuming 1 token arrives
+    then: The request is allowed and the remaining count decreases to 9
+
+  - criterion_id: AC-002
+    title: Burst exhaustion
+    given: A bucket with 0 remaining tokens
+    when: A new request arrives before any tokens have been refilled
+    then: The request is rejected with HTTP 429 and a Retry-After header
+
+  - criterion_id: AC-003
+    title: Token refill
+    given: A bucket with 0 tokens and a refill rate of 10 tokens/second
+    when: 1 second elapses with no incoming requests
+    then: The bucket contains exactly 10 tokens (capped at max capacity)
+
+non_functional_requirements:
+  - category: performance
+    description: Token check-and-decrement operation must complete within 2ms at p99
+    threshold: "p99 < 2ms"
+  - category: reliability
+    description: >
+      If Redis is unreachable, the limiter must fall back to a local
+      in-memory bucket with degraded accuracy, logging a warning.
+  - category: observability
+    description: >
+      Emit metrics for tokens_consumed, tokens_rejected, and bucket_refills
+      per API key, compatible with Prometheus exposition format.
+
+out_of_scope:
+  - Multi-region bucket synchronisation
+  - Dynamic reconfiguration without restart
+  - Cost-based token weighting per endpoint
