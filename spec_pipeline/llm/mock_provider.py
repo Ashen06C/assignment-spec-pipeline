@@ -43,9 +43,26 @@ class MockProvider(BaseLLMProvider):
 
     def _route(self, combined: str, raw_prompt: str) -> dict[str, Any]:
         """Pick a mock response based on keywords in the prompt."""
-        if "planning" in combined or "implementation plan" in combined:
+        if (
+            "generate the required code" in combined
+            or "code changes" in combined
+            or "synthesis" in combined
+        ):
+            return self._implementation_response(raw_prompt)
+        if (
+            "generate comprehensive test" in combined
+            or "test generation" in combined
+            or "qa engineer" in combined
+            or "test cases" in combined
+        ):
+            return self._test_generation_response(raw_prompt)
+        if (
+            "software architect" in combined
+            or "produce an implementation plan" in combined
+            or "planning" in combined
+        ):
             return self._planning_response(raw_prompt)
-        if any(kw in combined for kw in ("code", "implement", "synthesis")):
+        if any(kw in combined for kw in ("code", "implement")):
             return self._implementation_response(raw_prompt)
         if "test" in combined:
             return self._test_generation_response(raw_prompt)
