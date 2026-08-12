@@ -117,13 +117,11 @@ class Planner:
         ordered_tasks = order_tasks_dag(tasks)
 
         # 2. Extract Impacted Files and Modules
-        impacted_files = plan_data.get("impacted_files", [])
-        if not impacted_files:
-            # Infer from tasks if omitted
-            inferred_files: set[str] = set()
-            for task in ordered_tasks:
-                inferred_files.update(task.target_files)
-            impacted_files = sorted(inferred_files) if inferred_files else ["src/feature.py"]
+        raw_impacted = plan_data.get("impacted_files", [])
+        inferred_files: set[str] = set(raw_impacted)
+        for task in ordered_tasks:
+            inferred_files.update(task.target_files)
+        impacted_files = sorted(inferred_files) if inferred_files else ["src/feature.py"]
 
         impacted_modules = plan_data.get("impacted_modules", [])
         if not impacted_modules:

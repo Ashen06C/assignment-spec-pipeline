@@ -16,9 +16,25 @@ class OpenAIProvider(BaseLLMProvider):
     """Calls the OpenAI Chat Completions REST API."""
 
     def __init__(self, config: LLMConfig) -> None:
+        key = config.api_key
+        if not key:
+            from spec_pipeline.core.config import load_settings
+
+            key = load_settings().openai_api_key
+
+        if not key:
+            raise LLMProviderError("openai", "OPENAI_API_KEY is not set in environment or .env")
+
+        if key != config.api_key:
+            config = LLMConfig(
+                provider=config.provider,
+                model=config.model,
+                api_key=key,
+                temperature=config.temperature,
+                max_tokens=config.max_tokens,
+                extra=config.extra,
+            )
         super().__init__(config)
-        if not config.api_key:
-            raise LLMProviderError("openai", "OPENAI_API_KEY is not set")
 
     def generate(
         self,

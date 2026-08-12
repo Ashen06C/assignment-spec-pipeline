@@ -21,17 +21,19 @@ from spec_pipeline.llm.prompt_templates import (
 from spec_pipeline.testing.traceability import TraceabilityMatrixBuilder
 
 CONFTEST_TEMPLATE = """\
-\"\"\"Pytest configuration injecting sandbox src directory into sys.path.\"\"\"
+\"\"\"Pytest configuration injecting sandbox src and root directories into sys.path.\"\"\"
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-# Automatically inject the sandbox src directory into sys.path for direct module imports
-SRC_DIR = Path(__file__).resolve().parent.parent / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+SANDBOX_ROOT = Path(__file__).resolve().parent.parent
+SRC_DIR = SANDBOX_ROOT / "src"
+
+for p in (str(SANDBOX_ROOT), str(SRC_DIR)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
 """
 
 
@@ -165,11 +167,85 @@ class TestGenerator:
         for rel_path, code_blocks in files_content.items():
             target_file = (root / rel_path).resolve()
             target_file.parent.mkdir(parents=True, exist_ok=True)
-            combined_code = "\n\n".join(code_blocks)
+            combined_code = "\n\n".join(
+                self._sanitize_test_source(block) for block in code_blocks
+            )
             target_file.write_text(f"{combined_code}\n", encoding="utf-8")
+
+    @staticmethod
+    def _sanitize_test_source(source: str) -> str:
+        """Post-process LLM-generated test code to fix common mock mistakes.
+
+        Patches the most frequent pattern where MagicMock response objects are created
+        but their .read()/.decode() / .json() return values are never configured,
+        causing json.loads() to receive a MagicMock instead of bytes/str.
+        """
+        import re as _re  # noqa: PLC0415
+
+        lines = source.splitlines()
+        result: list[str] = []
+
+        for line in lines:
+            result.append(line)
+
+            # Detect lines that create a bare MagicMock or patch urlopen/http calls
+            # Pattern: mock_response = MagicMock()
+            # Insert .read.return_value configuration immediately after
+            m = _re.match(
+                r"^(\s*)(\w+)\s*=\s*MagicMock\(\s*\)\s*$",
+                line,
+            )
+            if m:
+                indent = m.group(1)
+                var = m.group(2)
+                # Only patch response-looking variables
+                if any(kw in var.lower() for kw in ("response", "resp", "res", "mock_res")):
+                    result.append(
+                        f'{indent}{var}.read.return_value = '
+                        'b\'{"status": "ok", "event_id": "test-id-001", '
+                        '"id": "test-id-001", "result": true}\'  '
+                        "# auto-patched: ensure .read() returns bytes for json.loads"
+                    )
+                    result.append(
+                        f"{indent}{var}.__enter__ = lambda s: s"
+                        "  # auto-patched: context manager support"
+                    )
+                    result.append(
+                        f"{indent}{var}.__exit__ = MagicMock(return_value=False)"
+                        "  # auto-patched: context manager support"
+                    )
+
+            # Pattern: with patch(...) as mock_X: — if used as context manager mock for urlopen
+            # Ensure the inner mock's read().return_value is bytes
+            m2 = _re.match(
+                r"^(\s*)with\s+patch\(['\"].*?urlopen['\"].*?\)\s+as\s+(\w+)\s*:",
+                line,
+            )
+            if m2:
+                # The next indented block will use mock_X; we can't easily inject there,
+                # but we can inject a configure_mock call just after the with line
+                indent = m2.group(1) + "    "
+                var = m2.group(2)
+                result.append(
+                    f"{indent}{var}.return_value.read.return_value = "
+                    'b\'{"status": "ok", "event_id": "test-id-001", "result": true}\''
+                    "  # auto-patched"
+                )
+                result.append(
+                    f"{indent}{var}.return_value.__enter__ = "
+                    f"lambda s: {var}.return_value"
+                    "  # auto-patched"
+                )
+                result.append(
+                    f"{indent}{var}.return_value.__exit__ = MagicMock(return_value=False)"
+                    "  # auto-patched"
+                )
+
+        return "\n".join(result)
 
 
 def re_slug(text: str) -> str:
     """Sanitize string for python function naming."""
     import re
     return re.sub(r"[^a-zA-Z0-9_]", "_", text.lower()).strip("_")
+

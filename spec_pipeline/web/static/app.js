@@ -592,33 +592,37 @@
   }
 
   function renderCodeAndDiffs(impl) {
-    if (!impl || !impl.files) return;
+    if (!impl) return;
+
+    const changes = impl.changes || impl.files || [];
+    if (!Array.isArray(changes) || changes.length === 0) return;
 
     currentSynthesizedFiles = {};
     el.synthesizedFilesTree.innerHTML = '';
 
-    impl.files.forEach((f, idx) => {
-      currentSynthesizedFiles[f.relative_path] = f;
+    changes.forEach((c, idx) => {
+      const filePath = c.path || c.relative_path || 'src/module.py';
+      currentSynthesizedFiles[filePath] = c;
       const li = document.createElement('li');
       li.className = 'files-tree-item' + (idx === 0 ? ' active' : '');
-      li.textContent = f.relative_path;
+      li.textContent = filePath;
       li.addEventListener('click', () => {
         document.querySelectorAll('.files-tree-item').forEach(item => item.classList.remove('active'));
         li.classList.add('active');
-        showFileDiff(f);
+        showFileDiff(c);
       });
       el.synthesizedFilesTree.appendChild(li);
     });
 
-    if (impl.files.length > 0) {
-      showFileDiff(impl.files[0]);
-    }
+    showFileDiff(changes[0]);
   }
 
   function showFileDiff(fileObj) {
-    el.viewerFileName.textContent = fileObj.relative_path;
-    el.viewerFileAction.textContent = fileObj.action ? fileObj.action.toUpperCase() : 'CREATED';
-    el.diffViewport.textContent = fileObj.unified_diff || fileObj.content || '// Empty file';
+    if (!fileObj) return;
+    const filePath = fileObj.path || fileObj.relative_path || 'src/module.py';
+    el.viewerFileName.textContent = filePath;
+    el.viewerFileAction.textContent = (fileObj.action || 'CREATED').toUpperCase();
+    el.diffViewport.textContent = fileObj.unified_diff || fileObj.diff_summary || fileObj.content || '// Empty file';
   }
 
   function renderTestsAndTraceability(testGen) {
@@ -628,29 +632,55 @@
     const tbody = el.traceabilityMatrixTable.querySelector('tbody');
     tbody.innerHTML = '';
 
-    if (testGen.traceability_matrix && testGen.traceability_matrix.mappings) {
-      testGen.traceability_matrix.mappings.forEach(m => {
+    const tests = testGen.tests || [];
+
+    // Render Acceptance Criteria mappings
+    if (activeSpecData && activeSpecData.acceptance_criteria) {
+      activeSpecData.acceptance_criteria.forEach(ac => {
+        const mapped = tests.filter(t => t.source_criterion_id === ac.criterion_id);
+        const isMapped = mapped.length > 0;
+        const testNames = isMapped ? mapped.map(t => t.test_id || t.description).join(', ') : 'None (Uncovered)';
         const row = document.createElement('tr');
-        const isMapped = m.mapped_tests && m.mapped_tests.length > 0;
         row.innerHTML = `
-          <td><strong>${m.criterion_id}</strong></td>
-          <td>${m.requirement}</td>
-          <td><code>${isMapped ? m.mapped_tests.join(', ') : 'None (Uncovered)'}</code></td>
+          <td><strong>${ac.criterion_id}</strong></td>
+          <td>${ac.title || ac.given || 'Requirement'}</td>
+          <td><code>${testNames}</code></td>
           <td><span class="badge ${isMapped ? 'badge-success' : 'badge-danger'}">${isMapped ? '100% PASS' : 'MISSING'}</span></td>
         `;
         tbody.appendChild(row);
       });
     }
 
-    // Synthesized Pytest Files Code Viewport
-    if (testGen.tests && testGen.tests.length > 0) {
-      const codeBlocks = testGen.tests.map(t => `# File: ${t.relative_path}\n${t.content}`).join('\n\n' + '='.repeat(60) + '\n\n');
+    // Synthesized Test Suites Code Viewport
+    if (tests.length > 0) {
+      const codeBlocks = tests.map(t => {
+        const fPath = t.file_path || t.relative_path || 'tests/test_suite.py';
+        const code = t.source_code || t.content || '';
+        return `# File: ${fPath}\n# Test: ${t.test_id || ''} (${t.test_type || 'unit'}) - ${t.description || ''}\n\n${code}`;
+      }).join('\n\n' + '='.repeat(60) + '\n\n');
       el.testsCodeViewport.textContent = codeBlocks;
     }
   }
 
   function renderQualityGates(quality) {
-    if (!quality || !quality.gates) return;
+    if (!quality) return;
+
+    const rawGates = quality.gates;
+    let gatesMap = {};
+
+    if (Array.isArray(rawGates)) {
+      rawGates.forEach(g => {
+        const name = (g.gate_name || '').toLowerCase();
+        if (name.includes('syntax')) gatesMap['syntax'] = g;
+        else if (name.includes('lint') || name.includes('ruff')) gatesMap['lint'] = g;
+        else if (name.includes('type') || name.includes('mypy')) gatesMap['typecheck'] = g;
+        else if (name.includes('security')) gatesMap['security'] = g;
+        else if (name.includes('pytest') || name.includes('test')) gatesMap['pytest'] = g;
+        else if (name.includes('acceptance') || name.includes('ac')) gatesMap['acceptance_criteria'] = g;
+      });
+    } else if (typeof rawGates === 'object' && rawGates !== null) {
+      gatesMap = rawGates;
+    }
 
     const gateKeys = [
       { key: 'syntax', id: 'gateCard-syntax' },
@@ -665,20 +695,23 @@
       const card = document.getElementById(g.id);
       if (!card) return;
 
-      const res = quality.gates[g.key];
+      const res = gatesMap[g.key];
       const pill = card.querySelector('.gate-pill');
       const timing = card.querySelector('.gate-duration-val');
       const logBox = card.querySelector('.gate-log-box');
 
       if (res) {
-        const isPassed = res.passed;
+        const isPassed = Boolean(res.passed);
         pill.textContent = isPassed ? 'PASSED' : 'FAILED';
         pill.className = 'gate-pill ' + (isPassed ? 'pill-pass' : 'pill-fail');
-        timing.textContent = `${res.duration_ms.toFixed(2)} ms`;
+        const duration = res.duration_seconds !== undefined
+          ? (res.duration_seconds * 1000).toFixed(1) + ' ms'
+          : (res.duration_ms ? res.duration_ms.toFixed(1) + ' ms' : '—');
+        timing.textContent = duration;
 
-        if (!isPassed && res.errors && res.errors.length > 0) {
+        if (!isPassed && (res.details || res.stderr || res.stdout)) {
           logBox.style.display = 'block';
-          logBox.textContent = res.errors.join('\n');
+          logBox.textContent = res.details || res.stderr || res.stdout;
         } else {
           logBox.style.display = 'none';
         }

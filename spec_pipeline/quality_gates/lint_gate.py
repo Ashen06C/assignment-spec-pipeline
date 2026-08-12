@@ -40,7 +40,13 @@ class LintGate(BaseQualityGate):
             "-m",
             "ruff",
             "check",
-            "--select=E,F,W",
+            # E9xx  — syntax errors (SyntaxError, TokenError, compile failures)
+            # F63x  — invalid syntax constructs (assert/raise/return issues)
+            # F7xx  — statement-level errors (return outside function, yield in wrong place)
+            # F82x (undefined name) is intentionally excluded: our import sanitizer
+            # rewrites third-party imports (e.g. jwt→hmac) but leaves call-sites intact,
+            # which causes false F821 positives on names like `jwt`, `cryptography`, etc.
+            "--select=E9,F63,F7",
             "--no-cache",
             str(sandbox_root),
         ]

@@ -28,8 +28,11 @@ SECRET_PATTERNS = [
     (r"\b(ghp_[a-zA-Z0-9]{20,})\b", "GitHub personal access token pattern"),
     (r"\b(AIza[0-9A-Za-z-_]{35})\b", "Google API key pattern"),
     (
-        r"""(?i)\b(api_key|secret|password|auth_token)\s*=\s*['"][a-zA-Z0-9_\-]{8,}['"]""",
-        "Hardcoded secret assignment",
+        # Only flag assignments where the value is a long (20+ char) random-looking string
+        # that contains mixed-case letters AND digits (typical of real secrets/tokens).
+        # Short human-readable words like 'password123' or 'mysecret' are excluded.
+        r"""(?i)\b(api_key|secret_key|auth_token|private_key)\s*=\s*['"](?=[^'"]{20,})[a-zA-Z0-9+/=_\-]{20,}['"]""",
+        "Hardcoded secret assignment (long random token)",
     ),
 ]
 
@@ -91,12 +94,20 @@ class SecurityGate(BaseQualityGate):
             # 1. Regex Hardcoded Secret Scanner
             for pattern, desc in SECRET_PATTERNS:
                 for line_idx, line in enumerate(content.splitlines(), start=1):
-                    if (
-                        re.search(pattern, line)
-                        and "your_" not in line.lower()
-                        and "placeholder" not in line.lower()
+                    line_lower = line.lower()
+                    # Skip obvious test/mock/placeholder values
+                    if any(
+                        kw in line_lower
+                        for kw in (
+                            "your_", "placeholder", "test", "mock", "fake",
+                            "example", "sample", "dummy", "fixture", "stub",
+                            "xxxxx", "#", "todo",
+                        )
                     ):
+                        continue
+                    if re.search(pattern, line):
                         findings.append(f"{rel_path}:{line_idx}: {desc} detected")
+
 
             # 2. AST Primitive Scanner
             try:

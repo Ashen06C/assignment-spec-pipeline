@@ -18,9 +18,25 @@ class GeminiProvider(BaseLLMProvider):
     """Calls the Google Gemini REST API (``generativelanguage.googleapis.com``)."""
 
     def __init__(self, config: LLMConfig) -> None:
+        key = config.api_key
+        if not key:
+            from spec_pipeline.core.config import load_settings
+
+            key = load_settings().gemini_api_key
+
+        if not key:
+            raise LLMProviderError("gemini", "GEMINI_API_KEY is not set in environment or .env")
+
+        if key != config.api_key:
+            config = LLMConfig(
+                provider=config.provider,
+                model=config.model,
+                api_key=key,
+                temperature=config.temperature,
+                max_tokens=config.max_tokens,
+                extra=config.extra,
+            )
         super().__init__(config)
-        if not config.api_key:
-            raise LLMProviderError("gemini", "GEMINI_API_KEY is not set")
 
     def generate(
         self,

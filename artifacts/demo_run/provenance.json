@@ -28,8 +28,8 @@
         }
       },
       "parameters": {
-        "run_id": "a19ad83a-3735-4c2e-9d96-35451dc9612c",
-        "spec_id": "e559ebcc-35f8-4433-b3cf-245da5928300",
+        "run_id": "0d6af1bd-1fe9-4f22-bd17-17f4be692cbd",
+        "spec_id": "937ba55b-f576-4f0f-844d-974b72911ea1",
         "spec_version": 1
       }
     },
@@ -42,8 +42,8 @@
       }
     ],
     "metadata": {
-      "buildStartedOn": "2026-08-11T20:18:10.946532+00:00",
-      "buildFinishedOn": "2026-08-11T20:18:14.117948+00:00",
+      "buildStartedOn": "2026-08-12T02:44:58.217215+00:00",
+      "buildFinishedOn": "2026-08-12T02:45:00.372782+00:00",
       "completeness": {
         "parameters": true,
         "environment": true,
@@ -56,15 +56,15 @@
         "checkpoint": "pre-implementation",
         "status": "approved",
         "reviewer": "Architect",
-        "signature": "3360742ddb0f0845c3ca652ce5f00e891551225574b624dce2594253e8a254a8",
-        "decided_at": "2026-08-11T20:18:10.947613+00:00"
+        "signature": "88102caace95adb7540d9397957ad5c69cbf0e20d616cbdf7819e003d1400dcb",
+        "decided_at": "2026-08-12T02:44:58.219586+00:00"
       },
       {
         "checkpoint": "pre-merge",
         "status": "approved",
         "reviewer": "Architect",
-        "signature": "b3bd341dba3dd7101e7b19ce65d71011c6f04b8ad7a97e1e9bbb78b479c8c04a",
-        "decided_at": "2026-08-11T20:18:14.117791+00:00"
+        "signature": "b1e0cd2dd3bb9f8f76904def1fcca124d797c8dace5a7cdfb55dc5bd9c29a4bc",
+        "decided_at": "2026-08-12T02:45:00.372568+00:00"
       }
     ],
     "qualityVerification": {
@@ -73,27 +73,27 @@
         {
           "gate_name": "syntax",
           "passed": true,
-          "duration_seconds": 0.0041
+          "duration_seconds": 0.0104
         },
         {
           "gate_name": "lint",
           "passed": true,
-          "duration_seconds": 0.0792
+          "duration_seconds": 0.1078
         },
         {
           "gate_name": "typecheck",
           "passed": true,
-          "duration_seconds": 2.1183
+          "duration_seconds": 0.3901
         },
         {
           "gate_name": "security",
           "passed": true,
-          "duration_seconds": 0.002
+          "duration_seconds": 0.0029
         },
         {
           "gate_name": "pytest",
           "passed": true,
-          "duration_seconds": 0.9631
+          "duration_seconds": 1.6313
         },
         {
           "gate_name": "acceptance_criteria",

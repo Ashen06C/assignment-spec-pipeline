@@ -10,7 +10,13 @@ from dotenv import load_dotenv
 
 
 def _find_dotenv() -> Path | None:
-    """Walk upward from CWD to locate a .env file."""
+    """Locate the .env file in the repository root or by walking upward from CWD."""
+    # First check repository root
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    candidate_root = repo_root / ".env"
+    if candidate_root.is_file():
+        return candidate_root
+
     current = Path.cwd()
     for directory in (current, *current.parents):
         candidate = directory / ".env"
@@ -49,7 +55,7 @@ def load_settings(dotenv_path: Path | None = None) -> PipelineSettings:
     ----------
     dotenv_path:
         Explicit path to a ``.env`` file.  When *None* the function searches
-        upward from the current working directory.
+        upward from the current working directory or repository root.
 
     Returns
     -------
@@ -58,11 +64,17 @@ def load_settings(dotenv_path: Path | None = None) -> PipelineSettings:
     """
     env_path = dotenv_path or _find_dotenv()
     if env_path is not None:
-        load_dotenv(env_path, override=False)
+        load_dotenv(env_path, override=True)
+
+    gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
+    openai_key = os.getenv("OPENAI_API_KEY", "").strip()
+
+    # Auto-detect default active provider if keys exist
+    default_provider = "gemini" if gemini_key else ("openai" if openai_key else "mock")
 
     return PipelineSettings(
-        gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
-        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
-        llm_provider=os.getenv("LLM_PROVIDER", "gemini").lower(),
-        llm_model=os.getenv("LLM_MODEL", "gemini-2.5-flash"),
+        gemini_api_key=gemini_key,
+        openai_api_key=openai_key,
+        llm_provider=os.getenv("LLM_PROVIDER", default_provider).lower().strip(),
+        llm_model=os.getenv("LLM_MODEL", "gemini-2.5-flash").strip(),
     )

@@ -30,33 +30,57 @@ def get_llm_provider(
     model_name: str | None = None,
 ) -> BaseLLMProvider:
     """Instantiate the correct LLM provider from *config* or keyword arguments."""
-    if config is None:
-        cfg = LLMConfig(
-            provider=provider_type or "mock",
-            model=model_name or ("mock-model" if (provider_type or "mock") == "mock" else ""),
-            api_key=api_key or "",
-        )
-    else:
-        cfg = config
+    from spec_pipeline.core.config import load_settings
 
-    provider = cfg.provider.lower()
+    settings = load_settings()
 
-    if provider == "gemini":
+    p_type = (
+        provider_type
+        or (config.provider if config else None)
+        or settings.llm_provider
+        or "mock"
+    ).lower()
+
+    # Resolve API key
+    resolved_key = api_key or (config.api_key if config else "")
+    if not resolved_key:
+        if p_type == "openai":
+            resolved_key = settings.openai_api_key
+        elif p_type == "gemini":
+            resolved_key = settings.gemini_api_key
+
+    # Resolve model
+    resolved_model = model_name or (config.model if config else "")
+    if not resolved_model:
+        if p_type == "openai":
+            resolved_model = "gpt-4o"
+        elif p_type == "gemini":
+            resolved_model = "gemini-2.5-flash"
+        elif p_type == "mock":
+            resolved_model = "mock-model"
+
+    cfg = LLMConfig(
+        provider=p_type,
+        model=resolved_model,
+        api_key=resolved_key,
+    )
+
+    if p_type == "gemini":
         from spec_pipeline.llm.gemini_provider import GeminiProvider
 
         return GeminiProvider(cfg)
 
-    if provider == "openai":
+    if p_type == "openai":
         from spec_pipeline.llm.openai_provider import OpenAIProvider
 
         return OpenAIProvider(cfg)
 
-    if provider == "mock":
+    if p_type == "mock":
         from spec_pipeline.llm.mock_provider import MockProvider
 
         return MockProvider(cfg)
 
     raise ValueError(
-        f"Unknown LLM provider: {cfg.provider!r}. "
-        "Supported: 'gemini', 'openai', 'mock'."
+        f"Unknown LLM provider: {p_type!r}. "
+        "Supported providers: 'mock', 'gemini', 'openai'."
     )
